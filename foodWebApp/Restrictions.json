@@ -1,0 +1,19 @@
+{
+	"one" : {
+		"vegetarian" : "it does not contain meat.", 
+		"lactosefree" :  "it does not contain lactose.",
+		"glutenfree" : "it does not contain gluten.",
+		"lownichel" : "it contains a lower quantity of nickel.",
+		"light" : "it contains a lower quantity of fats."
+	},
+
+	"two": {
+		"vegetarian" : "they not contain meat.", 
+		"lactosefree" :  "they do not contain lactose.",
+		"glutenfree" : "they do not contain gluten.",
+		"lownichel" : "they contain a lower quantity of nickel.",
+		"light" : "they contain a lower quantity of fats."
+	}
+	
+
+}

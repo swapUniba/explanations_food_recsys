@@ -1,0 +1,217 @@
+{
+	"sugars": {
+		"benefits" : ["energy supply",
+			"improve your mood",
+			"improve your thinking skill",
+			"help spleen and liver regulation",
+			"prevent thrombosis",
+			"increase blood flow",
+			"prevent sclerosis",
+			"reduce some kind of stress",
+			"reduce blood pressure",
+			"improve brain hesalth"
+		],
+		"risks" : [
+			"tooth decay",
+			"accelerated aging",
+			"obesity",
+			"diabetes",
+			"heart diseases",
+			"cancer",
+			"mood swings",
+			"periodontal disease",
+			"false hunger",
+			"immunodeficiency"
+		],
+		"RI" : 50
+	},
+	"carbohydrates": {
+		"benefits" : [
+			"supply energy",
+			"help to sleep better",
+			"improve your thinking skill",
+			"improve your mood",
+			"prevent thrombosis",
+			"prevent weight gain",
+			"reduce heart disease",
+			"improve digestion",
+			"decrease disease risk",
+			"give fullness"
+		],
+		"risks": [
+			"diabetes",
+			"heart diseases",
+			"cholesterol level",
+			"obesity",
+			"mood swings",
+			"tired",
+			"false hunger",
+			"sugar craving",
+			"colon cancer",
+			"stroke"
+		],
+		"RI" : 275
+	},
+	"proteins": {
+		"benefits" : [
+			"improve muscle development",
+			"control sugar level",
+			"prevent hair damage",
+			"slow down aging process",
+			"help in hormone balance",
+			"prevent heart disease",
+			"prevent weight gain",
+			"improve immunity system",
+			"improve digestion",
+			"reduce hunger"
+		],
+		"risks" : [
+			"mood swings",
+			"confusion",
+			"rage",
+			"obesity",
+			"constipation",
+			"dehydration",
+			"kidney damage",
+			"cancer",
+			"heart diseases",
+			"diarrhea"
+		],
+		"RI" : 50
+	},
+	"fat": {
+		"benefits" : [
+			"help to absorb fat soluble vitamins",
+			"supply energy",
+			"reduce hunger",
+			"extend fullness",
+			"add flavor and texture to food",
+			"help brain development and function",
+			"help liver functions",
+			"slow down brain cells aging",
+			"regulate cholesterol levels",
+			"help in hormone balance"
+		],
+		"risks" : [
+			"obesity",
+			"heart diseases",
+			"diabetes",
+			"cancer",
+			"sleep apnea",
+			"increse blood pressure",
+			"kidney damage",
+			"cholesterol level",
+			"stroke",
+			"age-related vision loss"
+		],
+		"RI" : 71
+	},
+	"saturatedFat": {
+		"benefits" : [
+			"help to absorb fat soluble vitamins",
+			"supply energy",
+			"reduce hunger",
+			"extend fullness",
+			"add flavor and texture to food",
+			"help brain development and function",
+			"help liver functions",
+			"slow down brain cells aging",
+			"regulate cholesterol levels",
+			"help in hormone balance"
+		],
+		"risks" : [
+			"obesity",
+			"heart diseases",
+			"diabetes",
+			"cancer",
+			"sleep apnea",
+			"increse blood pressure",
+			"kidney damage",
+			"cholesterol level",
+			"stroke",
+			"age-related vision loss"
+		],
+		"RI" : 18
+	},
+	"fibers": {
+		"benefits" : [
+			"improve digestion",
+			"reduce diabet risk",
+			"prevent constipation",
+			"reduce heart disease",
+			"reduce cancer risks",
+			"stabilize blood sugar",
+			"reduce false hunger",
+			"reduce cholesterol",
+			"reduce blood pressure",
+			"reduce stroke risks"
+		],
+		"risks" : [
+			"constipation",
+			"bloating",
+			"reduced sugar level",
+			"crohn's disease",
+			"weight gain",
+			"flatulence",
+			"diarrhea",
+			"nausea/vomiting",
+			"dehydration",
+			"nutrien deficiencies"
+		],
+		"RI" : 28
+	},
+	"cholesterol": {
+		"benefits" : [
+			"help to build cell membrane",
+			"help to make hormones",
+			"increase vitamin D production",
+			"increse metabolism",
+			"help to digest fat",
+			"help to absorb nutrients",
+			"improve your mood",
+			"prevent bowel risk",
+			"acts as an antioxidant",
+			"reduce infections risk"
+		],
+		"risks" : [
+			"stroke",
+			"confusion",
+			"heart disease",
+			"reduced blood flow",
+			"pain",
+			"legs numbness",
+			"hemorrhage",
+			"obesity",
+			"diabetes",
+			"increse blood pressure"
+		],
+		"RI" : 3
+	},
+	"sodium": {
+		"benefits" : [
+			"help brain function",
+			"reduce nausea/vomiting",
+			"improve comunications between cells",
+			"regulate ph",
+			"help osmotic pressure",
+			"balance body's fluids",
+			"help muscle contraction",
+			"control blood pressure",
+			"relieve muscle cramps",
+			"slow down skin aging process"
+		],
+		"risks" : [
+			"increase blood pressure",
+			"stroke",
+			"heart disease",
+			"obesity",
+			"dehydration",
+			"bloating",
+			"false hunger",
+			"pain",
+			"kidney damage",
+			"cancer"
+		],
+		"RI" : 5.25
+	}
+}

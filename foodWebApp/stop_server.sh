@@ -1,0 +1,1 @@
+pkill -f food_rs_webservice.py
