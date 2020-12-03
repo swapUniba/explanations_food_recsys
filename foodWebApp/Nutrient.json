@@ -1,6 +1,6 @@
 {
 	"sugars": {
-		"benefits" : ["energy supply",
+		"benefits" : ["improve energy supply",
 			"improve your mood",
 			"improve your thinking skill",
 			"help spleen and liver regulation",
@@ -9,7 +9,7 @@
 			"prevent sclerosis",
 			"reduce some kind of stress",
 			"reduce blood pressure",
-			"improve brain hesalth"
+			"improve brain health"
 		],
 		"risks" : [
 			"tooth decay",
@@ -21,13 +21,18 @@
 			"mood swings",
 			"periodontal disease",
 			"false hunger",
-			"immunodeficiency"
+			"immunodeficiency",
+			"increase acne",
+			"appearance of wrinkles",
+			"sagging in neck and chin",
+			"development of dark spots",
+			"slower healing of cuts and scraps"
 		],
 		"RI" : 50
 	},
 	"carbohydrates": {
 		"benefits" : [
-			"supply energy",
+			"improve energy supply",
 			"help to sleep better",
 			"improve your thinking skill",
 			"improve your mood",
@@ -36,7 +41,9 @@
 			"reduce heart disease",
 			"improve digestion",
 			"decrease disease risk",
-			"give fullness"
+			"give fullness",
+			"prevents diabetes",
+			"prevents hypertension"
 		],
 		"risks": [
 			"diabetes",
@@ -44,11 +51,13 @@
 			"cholesterol level",
 			"obesity",
 			"mood swings",
-			"tired",
+			"tiredness",
 			"false hunger",
 			"sugar craving",
 			"colon cancer",
-			"stroke"
+			"stroke",
+			"lactose intolerance",
+			"fructose malabsorption"
 		],
 		"RI" : 275
 	},
@@ -68,21 +77,23 @@
 		"risks" : [
 			"mood swings",
 			"confusion",
-			"rage",
+			"nervousness",
 			"obesity",
 			"constipation",
 			"dehydration",
 			"kidney damage",
 			"cancer",
 			"heart diseases",
-			"diarrhea"
+			"diarrhea",
+			"bad breath",
+			"osteoporosis"
 		],
 		"RI" : 50
 	},
 	"fat": {
 		"benefits" : [
 			"help to absorb fat soluble vitamins",
-			"supply energy",
+			"improve energy supply",
 			"reduce hunger",
 			"extend fullness",
 			"add flavor and texture to food",
@@ -98,18 +109,19 @@
 			"diabetes",
 			"cancer",
 			"sleep apnea",
-			"increse blood pressure",
+			"raised blood pressure",
 			"kidney damage",
 			"cholesterol level",
 			"stroke",
-			"age-related vision loss"
+			"vision loss",
+			"lower immune response"
 		],
 		"RI" : 71
 	},
 	"saturatedFat": {
 		"benefits" : [
 			"help to absorb fat soluble vitamins",
-			"supply energy",
+			"improve energy supply",
 			"reduce hunger",
 			"extend fullness",
 			"add flavor and texture to food",
@@ -125,18 +137,19 @@
 			"diabetes",
 			"cancer",
 			"sleep apnea",
-			"increse blood pressure",
+			"raised blood pressure",
 			"kidney damage",
 			"cholesterol level",
 			"stroke",
-			"age-related vision loss"
+			"vision loss",
+			"lower immune response"
 		],
 		"RI" : 18
 	},
 	"fibers": {
 		"benefits" : [
 			"improve digestion",
-			"reduce diabet risk",
+			"reduce diabetes risk",
 			"prevent constipation",
 			"reduce heart disease",
 			"reduce cancer risks",
@@ -165,7 +178,7 @@
 			"help to build cell membrane",
 			"help to make hormones",
 			"increase vitamin D production",
-			"increse metabolism",
+			"increase metabolism",
 			"help to digest fat",
 			"help to absorb nutrients",
 			"improve your mood",
@@ -183,7 +196,7 @@
 			"hemorrhage",
 			"obesity",
 			"diabetes",
-			"increse blood pressure"
+			"raised blood pressure"
 		],
 		"RI" : 3
 	},
@@ -191,7 +204,7 @@
 		"benefits" : [
 			"help brain function",
 			"reduce nausea/vomiting",
-			"improve comunications between cells",
+			"improve communications between cells",
 			"regulate ph",
 			"help osmotic pressure",
 			"balance body's fluids",
@@ -201,7 +214,7 @@
 			"slow down skin aging process"
 		],
 		"risks" : [
-			"increase blood pressure",
+			"raised blood pressure",
 			"stroke",
 			"heart disease",
 			"obesity",

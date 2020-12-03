@@ -13,12 +13,10 @@ if(isset($_POST['prevDish'])) {
 } else {
 	@session_start();
 }
-
 */
 
 
-@session_start();
-
+session_start();
 
 ?>
 
@@ -108,36 +106,54 @@ if(isset($_POST['prevDish'])) {
 								if($exp) {
 									$rec = str_replace("_exp","",$dish);
 									
-									$pRecipeName = $data[('personalized_'.$rec)]['name'];
-									$pImgURL = $data[('personalized_'.$rec)]['imgURL'];
-									$pIngredients = $data[('personalized_'.$rec)]['ingredients'];
-									$pDescription = $data[('personalized_'.$rec)]['description'];
-									$pURL = $data[('personalized_'.$rec)]['url'];
+									$pRecipeName = $data[('personalized_'.$rec.'_1')]['name'];
+									$pImgURL = $data[('personalized_'.$rec).'_1']['imgURL'];
+									$pIngredients = $data[('personalized_'.$rec.'_1')]['ingredients'];
+									//$pDescription = $data[('personalized_'.$rec.'_1')]['description'];
+									$pURL = $data[('personalized_'.$rec.'_1')]['url'];
 									$pIngredients = createIngText($pIngredients);
 									
 									
-									$recipeName = $data[('not_personalized_'.$rec)]['name'];
-									$imgURL = $data[('not_personalized_'.$rec)]['imgURL'];
-									$ingredients = $data[('not_personalized_'.$rec)]['ingredients'];
-									$description = $data[('not_personalized_'.$rec)]['description'];
-									$URL = $data[('not_personalized_'.$rec)]['url'];
+									$recipeName = $data[('personalized_'.$rec.'_2')]['name'];
+									$imgURL = $data[('personalized_'.$rec.'_2')]['imgURL'];
+									$ingredients = $data[('personalized_'.$rec.'_2')]['ingredients'];
+									//$description = $data[('personalized_'.$rec.'_2')]['description'];
+									$URL = $data[('personalized_'.$rec.'_2')]['url'];
 									$ingredients = createIngText($ingredients);									
 								} else {
-									$pRecipeName = $data[('personalized_'.$dish)]['name'];
-									$pImgURL = $data[('personalized_'.$dish)]['imgURL'];
-									$pIngredients = $data[('personalized_'.$dish)]['ingredients'];
-									$pDescription = $data[('personalized_'.$dish)]['description'];
-									$pURL = $data[('personalized_'.$dish)]['url'];
+									$pRecipeName = $data[('personalized_'.$dish.'_1')]['name'];
+									$pImgURL = $data[('personalized_'.$dish.'_1')]['imgURL'];
+									$pIngredients = $data[('personalized_'.$dish.'_1')]['ingredients'];
+									//$pDescription = $data[('personalized_'.$dish.'_1')]['description'];
+									$pURL = $data[('personalized_'.$dish.'_1')]['url'];
 									$pIngredients = createIngText($pIngredients);
 									
 									
-									$recipeName = $data[('not_personalized_'.$dish)]['name'];
-									$imgURL = $data[('not_personalized_'.$dish)]['imgURL'];
-									$ingredients = $data[('not_personalized_'.$dish)]['ingredients'];
-									$description = $data[('not_personalized_'.$dish)]['description'];
-									$URL = $data[('not_personalized_'.$dish)]['url'];
+									$recipeName = $data[('personalized_'.$dish.'_2')]['name'];
+									$imgURL = $data[('personalized_'.$dish.'_2')]['imgURL'];
+									$ingredients = $data[('personalized_'.$dish.'_2')]['ingredients'];
+									//$description = $data[('personalized_'.$dish.'_2')]['description'];
+									$URL = $data[('personalized_'.$dish.'_2')]['url'];
 									$ingredients = createIngText($ingredients);
 								}
+
+								$explanations = $_SESSION['explanations'];
+								$mainTypeExpl = $_SESSION['mainTypeExpl'];
+								$secondTypeExpl = $_SESSION['secondTypeExpl'];
+								$dessertTypeExpl = $_SESSION['dessertTypeExpl'];
+
+								$typeOfExp = "";
+								switch ($dish){
+                                    case "main_exp":
+                                        $typeOfExp = $mainTypeExpl;
+                                        break;
+                                    case "second_exp":
+                                        $typeOfExp = $secondTypeExpl;
+                                        break;
+                                    case "dessert_exp":
+                                        $typeOfExp = $dessertTypeExpl;
+                                        break;
+                                }
 							?>
 							<!-- <a href="<?= $pURL ?>" target="_blank" class="col-md-6 blog-item-wrapper"> -->
 							<div class="col-lg-6 blog-item-wrapper recipe">
@@ -149,9 +165,9 @@ if(isset($_POST['prevDish'])) {
                                         <div id="titleA" class="blog-title text-center">
                                             <h4><?= $pRecipeName ?></h4>
                                         </div>
-                                        <div id="descA" class="blog-desc">
-                                            <p><font color="black"><?= $pDescription ?></font></p>
-                                        </div>
+
+                                        <!-- Here descr-->
+
                                         <div class="blog-author">
 											<button data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
 												Click to show ingredients
@@ -181,9 +197,9 @@ if(isset($_POST['prevDish'])) {
                                         <div id="titleB" class="blog-title text-center">
                                             <h4><?= $recipeName ?></h4>
                                         </div>
-                                        <div id="descB" class="blog-desc">
-                                            <p><font color="black"><?= $description ?></font></p>
-                                        </div>
+
+                                        <!-- Here descr-->
+
                                         <div class="blog-author">
 											<button data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
 												Click to show ingredients
@@ -210,7 +226,7 @@ if(isset($_POST['prevDish'])) {
 									<div class="blog-item">
 										<div class="blog-text">
 											<div id="expB" class="blog-desc">
-												<p><font color="black"><?= $explanations[$dish][2] ?></font></p>
+												<p><font color="black"><?= $explanations[$dish][$typeOfExp] ?></font></p>
 											</div>
 										</div>
 									</div>

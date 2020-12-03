@@ -9,18 +9,18 @@ function getLogData(){
     return $data;
 }
 
-function createURL($mood, $stress, $depression, $underweight, $overweight, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $exp){
+function createURL_old($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $exp){
     $url = "http://localhost:5002/mood/?";
-    
+
     if($mood == 'Bad')
         $url = $url . "mood=bad&";
     if($stress== 'yes')
         $url = $url . "stress=yes&";
     if($depression == 'yes')
         $url = $url . "depression=yes&";
-    if($underweight)
+    if($fatclass < 19)
         $url = $url . "underweight=yes&";
-    if($overweight)
+    if($fatclass >= 25)
         $url = $url . "overweight=yes&";
     if($activity == "high")
         $url = $url . "activity=high&";
@@ -40,123 +40,166 @@ function createURL($mood, $stress, $depression, $underweight, $overweight, $acti
         $url = $url . "'isLight'=1&";
 
     $url = $url . "difficulty=". $exp ."&";
-    $url = $url . "n=5&lang=en";
-            
+    $url = $url . "n=10&lang=en";
+
+    return $url;
+}
+
+function createURL($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $exp, $user_time, $user_cost, $age, $goal){
+    $url = "http://localhost:5009/mood/?";
+
+    if($mood == 'Bad')
+        $url = $url . "mood=bad&";
+    if($stress== 'yes')
+        $url = $url . "stress=yes&";
+    if($depression == 'yes')
+        $url = $url . "depression=yes&";
+    $url = $url . "fatclass=". $fatclass ."&";
+    if($activity == "high")
+        $url = $url . "activity=high&";
+    if($activity == "normal")
+        $url = $url . "activity=medium&";
+    if($sleep == 'low')
+        $url = $url . "sleep=low&";
+    if($vegetarian)
+        $url = $url . "isVegetarian=1&";
+    if($lactose)
+        $url = $url . "isLactoseFree=1&";
+    if($gluten)
+        $url = $url . "isGlutenFree=1&";
+    if($nickel)
+        $url = $url . "isLowNickel=1&";
+    if($light)
+        $url = $url . "'isLight'=1&";
+
+    $url = $url . "difficulty=". $exp ."&";
+    $url = $url . "user_time=". $user_time ."&";
+    $url = $url . "user_cost=". $user_cost ."&";
+    $url = $url . "age=". $age ."&";
+    $url = $url . "goal=". $goal ."&";
+
+    $url = $url . "n=10&lang=en";
+
     return $url;
 }
 
 function createUrlExp(
 		$mood, $stress, $depression,
-		$underweight, $overweight, $activity, $goal, $sleep,
+		$fatclass, $health_style, $health_condition, $activity, $sleep,
 		$vegetarian, $lactose, $gluten, $nickel, $light,
-		$joint, $cholesterol, $heart, $pressure, $diabete,
-		$exp, $imgurlA, $imgurlB)
+		$user_time, $user_cost, $age, $goal,
+		$user_difficulty, $imgurlA, $imgurlB,
+        $userFavIngredient)
 	{	
 	$url = "http://localhost:5003/exp/?";
-    
-	
-	//MOOD
-    if($mood == 'Bad')
-        $url = $url . "mood=bad&";
-	else {
-		if($mood == 'Good')
-			$url = $url . "mood=good&";
-		else
-			$url = $url . "mood=neutral&";
-	}
-	//STRESS
-	if($stress== 'yes')
-        $url = $url . "stress=yes&";
-	else
-        $url = $url . "stress=no&";
-	
-	//DEPRESSION
-    if($depression == 'yes')
-        $url = $url . "depression=yes&";
-	else
-		$url = $url . "depression=no&";
-    
-	
-	//BMI
-	if($underweight)
-        $url = $url . "bmi=under&";
-    else {
-		if($overweight)
-			$url = $url . "bmi=over&";
-		else
-			$url = $url . "bmi=normal&";
-    }
-	
-	//ACTIVITY
-	if($activity == "high")
-        $url = $url . "activity=high&";
-	else {
-		if($activity == "low")
-			$url = $url . "activity=low&";
-		else
-			$url = $url . "activity=normal&";
-	}
-	
-	//GOAL
-	if($goal == "Lose weight")
-        $url = $url . "goal=lose&";
-    else {
-		if($goal == "Gain weight")
-			$url = $url . "goal=gain&";
-		else
-			$url = $url . "goal=no&";
-	}
-	
-	//SLEEP
-	if($sleep == 'low')
-        $url = $url . "sleep=low&";
-	else
-		$url = $url . "sleep=good&";
-	
-	//RESTRICTION & PROBLEMS
-	$restrictions = [];
-	$problems = [];
-    
-	//RESTRICTION
-	if($vegetarian)
-		array_push($restrictions,"vegetarian");
-	if($lactose)
-        array_push($restrictions,"lactosefree");
-	if($gluten)
-		array_push($restrictions,"glutenfree");
-	if($nickel)
-		array_push($restrictions,"lownichel");
-	if($light)
-		array_push($restrictions,"light");
-	
-	
-	if(count($restrictions) > 0)
-		$url = $url . "restr=" . urlencode(implode(",",$restrictions)) . "&";
-	
-	//PROBLEMS
-	if($heart)
-		array_push($problems,"heart");
-	if($diabete)
-		array_push($problems,"diabete");
-	if($joint)
-		array_push($problems,"joint");
-	if($pressure)
-		array_push($problems,"pressure");
-	if($cholesterol)
-		array_push($problems,"chol");
-	
-	if(count($problems) > 0)
-		$url = $url . "prob=" . urlencode(implode(",",$problems)) . "&";
-	
-	
-	//IMGURL & DIFFICULTY
-	$url = $url 
-		. "imgurl1=" . urlencode($imgurlA) 
-		. "&imgurl2=" . urlencode($imgurlB) 
-		. "&difficulty=". $exp;
-		//."&n=5&lang=en";
-	
-    return $url;
+
+
+        //MOOD
+        if($mood == 'Bad')
+            $url = $url . "mood=bad&";
+        else {
+            if($mood == 'Good')
+                $url = $url . "mood=good&";
+            else
+                $url = $url . "mood=neutral&";
+        }
+        //STRESS
+        if($stress== 'yes')
+            $url = $url . "stress=yes&";
+        else
+            $url = $url . "stress=no&";
+
+        //DEPRESSION
+        if($depression == 'yes')
+            $url = $url . "depression=yes&";
+        else
+            $url = $url . "depression=no&";
+
+        //HEALTH LIFESTYLE
+        $url = $url . "health_style=". $health_style ."&";
+        //HEALTH CONDITION
+        $url = $url . "health_condition=" . $health_condition . "&";
+        //BMI
+        if($fatclass<19.0)
+            $url = $url . "bmi=under&";
+        else {
+            if($fatclass>=19.0 && $fatclass<25.0)
+                $url = $url . "bmi=over&";
+            else
+                $url = $url . "bmi=normal&";
+        }
+
+        //ACTIVITY
+        if($activity == "high")
+            $url = $url . "activity=high&";
+        else {
+            if($activity == "low")
+                $url = $url . "activity=low&";
+            else
+                $url = $url . "activity=normal&";
+        }
+
+        //SLEEP
+        if($sleep == 'low')
+            $url = $url . "sleep=low&";
+        else
+            $url = $url . "sleep=good&";
+
+        //COOKING EXPERIENCE
+        $url = $url . "difficulty=". $user_difficulty ."&";
+
+        //TIME and COST
+        $url = $url . "user_time=". $user_time ."&";
+        $url = $url . "user_cost=". $user_cost ."&";
+
+        //AGE
+        $url = $url . "user_age=". $age ."&";
+
+        //GOAL
+        if($goal == "Lose weight")
+            $url = $url . "goal=lose&";
+        else {
+            if($goal == "Gain weight")
+                $url = $url . "goal=gain&";
+            else
+                $url = $url . "goal=no&";
+        }
+
+
+
+        //RESTRICTION & INGREDIENTS
+        $restrictions = [];
+
+        //RESTRICTION
+        if($vegetarian)
+            array_push($restrictions,"vegetarian");
+        if($lactose)
+            array_push($restrictions,"lactosefree");
+        if($gluten)
+            array_push($restrictions,"glutenfree");
+        if($nickel)
+            array_push($restrictions,"lownichel");
+        if($light)
+            array_push($restrictions,"light");
+
+
+        if(count($restrictions) > 0)
+            $url = $url . "restr=" . urlencode(implode(",",$restrictions)) . "&";
+
+
+        //INGREDIENTS
+        $url = $url . "user_ingredients=" . $userFavIngredient . "&";
+
+
+
+
+        //IMGURL
+        $url = $url
+            . "imgurl1=" . urlencode($imgurlA)
+            . "&imgurl2=" . urlencode($imgurlB);
+        //."&n=5&lang=en";
+
+        return $url;
 }
 
 function getExplanation($url) {
@@ -164,71 +207,135 @@ function getExplanation($url) {
 }
 
 
-function getRecipes($pers_url){
-	
-	//$pers_url example  http://localhost:5002/mood/?overweight=yes&activity=low&sleep=low&isGlutenFree=1&difficulty=5&n=5&lang=en
-	
-    $pers_data_primo = performRequest(($pers_url."&category=Primi%20piatti"));
-    $not_pers_data_primo = performRequest("http://localhost:5002/mood/?category=Primi%20piatti&n=10&lang=en");
-    
-    $pers_data_secondo = performRequest(($pers_url."&category=Secondi%20piatti"));
-    $not_pers_data_secondo = performRequest("http://localhost:5002/mood/?category=Secondi%20piatti&n=10&lang=en");
-    
-    $pers_data_dolce = performRequest(($pers_url."&category=Dolci"));
-    $not_pers_data_dolce = performRequest("http://localhost:5002/mood/?category=Dolci&n=10&lang=en");
-    
+function getRecipes($pers_url_new, $pers_url_old){
+    /*
+    se il valore di $rec_1 o $rec_2 è 0 allora è stato utilizzato il sistema di raccomandazione popolare
+    se il valore di $rec_1 o $rec_2 è 1 allora è stato utilizzato il sistema di raccomandazione precedente (run on 5002)
+    se il valore di $rec_1 o $rec_2 è 2 allora è stato utilizzato il sistema di raccomandazione attuale (run on 5009)
+
+    $rec_1 = rand(0,2);
+
+    if($rec_1 == 0){
+        $pers_url_1 = "http://localhost:5009/mood/?fatclass=22&n=10&lang=en";
+        $rec_2 = rand(1,2);
+
+        if($rec_2 == 1){
+            $pers_url_2 = $pers_url_old;
+        }
+        else{
+            $pers_url_2 = $pers_url_new;
+        }
+    }
+
+    if($rec_1 == 1){
+        $pers_url_1 = $pers_url_old;
+        $rec_2 = rand(0,1) * 2;
+
+        if($rec_2 == 0){
+            $pers_url_2 = "http://localhost:5009/mood/?fatclass=22&n=10&lang=en";
+        }
+        else{
+            $pers_url_2 = $pers_url_new;
+        }
+    }
+
+    if($rec_1 == 2){
+        $pers_url_1 = $pers_url_new;
+        $rec_2 = rand(0,1);
+
+        if($rec_2 == 0){
+            $pers_url_2 = "http://localhost:5009/mood/?fatclass=22&n=10&lang=en";
+        }
+        else{
+            $pers_url_2 = $pers_url_old;
+        }
+    }
+    /* per test
+    $rec_1 = 2;
+    $rec_2 = 1;
+
+    $pers_url_2 = $pers_url_old;
+    $pers_url_1 = $pers_url_new;
+    */
+
+    $rec_1 = 2;
+    $rec_2 = 0;
+
+    $pers_url_1 = $pers_url_new;
+    $pers_url_2 = "http://localhost:5009/mood/?fatclass=22&n=10&lang=en";
+    $pers_data_primo_1 = performRequest(($pers_url_1."&category=Primi%20piatti"), $rec_1);
+    $pers_data_primo_2 = performRequest(($pers_url_2."&category=Primi%20piatti"), $rec_2);
+
+    $pers_data_secondo_1 = performRequest(($pers_url_1."&category=Secondi%20piatti"), $rec_1);
+    $pers_data_secondo_2 = performRequest(($pers_url_2."&category=Secondi%20piatti"), $rec_2);
+
+    $pers_data_dolce_1 = performRequest(($pers_url_1."&category=Dolci"), $rec_1);
+    $pers_data_dolce_2 = performRequest(($pers_url_2."&category=Dolci"), $rec_2);
+
     return array(
-		"personalized_main" => $pers_data_primo,
-		"not_personalized_main" => $not_pers_data_primo,
-		"personalized_second" => $pers_data_secondo,
-		"not_personalized_second" => $not_pers_data_secondo,
-		"personalized_dessert" => $pers_data_dolce,
-		"not_personalized_dessert" => $not_pers_data_dolce
-	);
+        "personalized_main_1" => $pers_data_primo_1,
+        "personalized_main_2" => $pers_data_primo_2,
+        "personalized_second_1" => $pers_data_secondo_1,
+        "personalized_second_2" => $pers_data_secondo_2,
+        "personalized_dessert_1" => $pers_data_dolce_1,
+        "personalized_dessert_2" => $pers_data_dolce_2,
+        "rec_1" => $rec_1,
+        "rec_2" => $rec_2);
 }
 
-function performRequest($url){
-	
-	//  Initiate curl
-	$ch = curl_init();
-	
-	// Will return the response, if false it print the response
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	
-	// Set the url
-	curl_setopt($ch, CURLOPT_URL, $url);
-	
-	// Execute
-	$result=curl_exec($ch);
-	
-	// Closing
-	curl_close($ch);
+function performRequest($url, $typeRecommendation){
+    /*
+    se il valore di $typeRecommendation è 0 allora è stato utilizzato il sistema di raccomandazione popolare
+    se il valore di $typeRecommendation è 1 allora è stato utilizzato il sistema di raccomandazione precedente (run on 5002)
+    se il valore di $typeRecommendation è 2 allora è stato utilizzato il sistema di raccomandazione attuale (run on 5009)
+    */
+    $top = 0; //indica la ricetta restituita, se 0 => top-1
 
-	//sostituisco \" con " e \\ con \ nel risultato, poi elimino il primo carattere (") e gli ultimi due ("\n)
-	//$result = str_replace("\\", "", "$result");
-	$result = str_replace('\\"', "\"", "$result");
-	$result = str_replace('\\\\', "\\", "$result");
-	$result = substr($result, 1);
-	$result = substr_replace($result ,"", -2);	
-	//echo $result;
+    /*
+     * Se si tratta della ricetta consigliata con il sistema popolare ($typeRecommendation = 0) restituiamo una random tra le top-5 per diversificare
+     * Se si tratta della ricetta consigliata dal recommender ($typeRecommendation = 1 o 2) restituiamo la top-1
+     */
+    if ($typeRecommendation == 0)
+    {
+        $top = rand(0, 4);
+    }
 	
-	//vado a decodificare il json e lo metto in un array
-	$arr = json_decode($result,true);	
-	
-	//salvo il nome della ricetta, l'url dell'immagine e gli altri elementi da restituire
-	if(!empty($arr["data"])) {
-		$name = $arr["data"][0][1];
-		$imageURL = $arr["data"][0][4];
-		$ingredients = $arr["data"][0][24];
-		$description = $arr["data"][0][5];
-        $url = $arr["data"][0][0];
-        
-		
-		return array("name" => $name, "imgURL" => $imageURL, "ingredients" => $ingredients, "description" => $description, "url" => $url);
-	}
-	else{
-		return array("name" => "Purtroppo non ho trovato nessuna ricetta &#x1f60c");
-	}
+	///  Initiate curl
+    $ch = curl_init();
+    // Will return the response, if false it print the response
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    // Set the url
+    curl_setopt($ch, CURLOPT_URL, $url);
+    // Execute
+    $result=curl_exec($ch);
+    // Closing
+    curl_close($ch);
+
+    //sostituisco \" con " e \\ con \ nel risultato, poi elimino il primo carattere (") e gli ultimi due ("\n)
+    //$result = str_replace("\\", "", "$result");
+    $result = str_replace('\\"', "\"", "$result");
+    $result = str_replace('\\\\', "\\", "$result");
+    $result = substr($result, 1);
+    $result = substr_replace($result ,"", -2);
+    //echo $result;
+
+    //vado a decodificare il json e lo metto in un array
+    $arr = json_decode($result,true);
+
+    //salvo il nome della ricetta, l'url dell'immagine e gli altri elementi da restituire
+    if(!empty($arr["data"])) {
+        $name = $arr["data"][$top][1];
+        $imageURL = $arr["data"][$top][4];
+        $ingredients = $arr["data"][$top][24];
+        $description = $arr["data"][$top][5];
+        $url = $arr["data"][$top][0];
+
+
+        return array("name" => $name, "imgURL" => $imageURL, "ingredients" => $ingredients, "description" => $description, "url" => $url);
+    }
+    else{
+        return array("name" => "Purtroppo non ho trovato nessuna ricetta &#x1f60c");
+    }
 }
 
 function performRequestExp($url){
@@ -251,7 +358,7 @@ function performRequestExp($url){
 	//json dedode in array
 	$jsonArray = json_decode(json_decode($result),true);
 	
-	return($jsonArray['explanation']);
+	return($jsonArray['explanations']);
 }
 
 function getMyrrorData($json_data){

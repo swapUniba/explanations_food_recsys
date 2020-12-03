@@ -1,0 +1,11 @@
+HTTrack3.49-2+htsswf+htsjava launched on Fri, 21 Feb 2020 13:25:07 at http://90.147.102.243:8080/foodrecsys/ +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "it, en, *" http://90.147.102.243:8080/foodrecsys/ -O1 "C:\Mie pagine Web\foodrecsys" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+
+HTTrack Website Copier/3.49-2 mirror complete in 35 seconds : 13 links scanned, 12 files written (1226427 bytes overall) [889999 bytes received at 25428 bytes/sec], 457871 bytes transferred using HTTP compression in 10 files, ratio 25%, 1.8 requests per connection
+(No errors, 0 warnings, 0 messages)
