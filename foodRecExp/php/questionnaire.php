@@ -141,15 +141,13 @@
 </div>
 
 <div class="form-group row " id="Q7div">
-	<div class="col-lg-6">
-		<label class="question" for="Q7">I chose it because there was no other choice. I would not have chosen any of these</label>
-	</div>
-	<div class="col-lg-6 yes_no">
-		<input type="radio" name="Q7" id="y" value="yes" required/>
-		<label for="y">Yes</label>
-		<input type="radio" name="Q7" id="n" value="no" required/>
-		<label for="n">No</label>
-	</div>
+    <div class="col-lg-6">
+        <label class="question" for="Q7">I chose it because there was no other choice. </label>
+    </div>
+    <div class="col-lg-6 yes_no">
+        <input type="checkbox" name="Q7" id="y" value="yes" />
+        <label for="y">I would not have chosen any of these</label>
+    </div>
 </div>
 
 <div class="form-group row" id="Q8div">
@@ -205,8 +203,7 @@
 			document.getElementById( 'star2Q6' ).required = false;
 			document.getElementById( 'star1Q6' ).required = false;
 
-			document.getElementById('y').required = false;
-			document.getElementById('n').required = false;
+            document.getElementById('y').required = false;
 		} else {
 			document.getElementById( 'Q2div' ).style.display = '';
 			document.getElementById( 'Q3div' ).style.display = '';
@@ -246,8 +243,7 @@
 			document.getElementById( 'star2Q6' ).required = true;
 			document.getElementById( 'star1Q6' ).required = true;
 
-			document.getElementById( 'y' ).required = true;
-			document.getElementById( 'n' ).required = true;
+            document.getElementById( 'y' ).required = false;
 
 		}
 	}

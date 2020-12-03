@@ -191,21 +191,21 @@ $(document).ready(function(){
 			if(q1 == prev) {
 				$("#labelPreQuest").find("h4").text("I did not change my choice because…");
 				
-				$("#Q2div").find('label.question').text("I am interested in healthy food and the previous recipe appeared healthier");
-				$("#Q3div").find('label.question').text("I like tasty food and the previous recipe seemed tastier");
+				$("#Q2div").find('label.question').text("I am interested in healthy food and the recipe I previously chose still appears healthier");
+				$("#Q3div").find('label.question').text("I like tasty food and the recipe I previously chose still seems tastier");
 				$("#Q4div").find('label.question').text("The recipe I previously chose was closer to my food preferences");
-				$("#Q5div").find('label.question').text("I am not a good cook and the previous recipe seemed easier to prepare");
-				$("#Q6div").find('label.question').text("I have precise food goals (e.g., lose/gain weight) and the previous recipe better fit my food goals");
-				$("#Q7div").find('label.question').text("I am interested in the food characteristics (e.g., calories, calcium, etc.) and the previous recipe shows them in a clearer way");
+				$("#Q5div").find('label.question').text("I am not a good cook and the recipe I previously chose still seems easier to prepare");
+				$("#Q6div").find('label.question').text("I have precise food goals (e.g., lose/gain weight) and the recipe I previously chose better fits my food goals");
+				$("#Q7div").find('label.question').text("I am interested in the food characteristics (e.g., calories, calcium, etc.) and the recipe I previously chose shows them in a clearer way");
 			} else {
 				$("#labelPreQuest").find("h4").text("I have changed my choice because…");
 				
-				$("#Q2div").find('label.question').text("I am interested in healthy food and the new recipe appears healthier");
-				$("#Q3div").find('label.question').text("I like tasty food and the new recipe seems tastier");
-				$("#Q4div").find('label.question').text("The new recipe is closer to my food preferences");
-				$("#Q5div").find('label.question').text("I am not a good cook and the new recipe seems easier to prepare");
-				$("#Q6div").find('label.question').text("I have precise food goals (e.g., lose/gain weight) and the new recipe better fits them");
-				$("#Q7div").find('label.question').text("I am interested in the food characteristics (e.g., calories, calcium, etc.) and the new recipe shows them in a clearer way");
+				$("#Q2div").find('label.question').text("I am interested in healthy food and the new recipe I chose now appears healthier");
+				$("#Q3div").find('label.question').text("I like tasty food and the new recipe I chose now seems tastier");
+				$("#Q4div").find('label.question').text("I understood that the new recipe I chose is closer to my food preferences");
+				$("#Q5div").find('label.question').text("I am not a good cook, and I understood that the new recipe I chose seems easier to prepare");
+				$("#Q6div").find('label.question').text("I have precise food goals (e.g., lose/gain weight) and the new recipe I chose better fits them");
+				$("#Q7div").find('label.question').text("I am interested in the food characteristics (e.g., calories, calcium, etc.) and the new recipe I chose now shows them in a clearer way");
 			}
 			
 			$("#questions").show();
