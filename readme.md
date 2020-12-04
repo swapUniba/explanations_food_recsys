@@ -31,15 +31,15 @@ Per arrestare il Recommender esegui il comando
 Per ulteriori informazioni sul servizio, leggi la documentazione del repo [FoodRecSys2020](https://github.com/swapUniba/FoodRecSys2020).
 
 
-##Servizio Explanations
+## Servizio Explanations
 
-Per avviare il Explanations esegui il comando
+Per avviare il servizio Explanations esegui il comando
 
 ```bash
     ./start_expl_server.sh 
 ```
 
-Per arrestare il Recommender esegui il comando
+Per arrestare il servizio Explanations esegui il comando
 
 ```bash
     ./stop_expl_server.sh 
