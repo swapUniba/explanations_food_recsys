@@ -69,4 +69,4 @@ The styles used are those present in the code and are all double level, ie expla
 ## Web Application "Rec Sys"
 
 The "Rec Sys" web application differs from the previous one in that a value is generated randomly for each use (variable ShowExpl in form.php).
-This value determines whether the configuration is unexplained, with single level explanation, or with double level explanation.
+This value determines whether the configuration is without explanation, with single level explanation, or with double level explanation.
