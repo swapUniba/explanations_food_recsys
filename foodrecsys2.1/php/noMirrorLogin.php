@@ -51,7 +51,7 @@
     $dessertTypeExplB= "";
 
 
-	if($dish == "main"){
+	if(($dish == "main") || ($dish == "main_exp") ){
         $sex = $_POST['sexOption'];
         $age = $_POST['age'];
         $height = $_POST['height'];

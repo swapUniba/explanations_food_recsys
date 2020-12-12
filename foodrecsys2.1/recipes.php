@@ -36,6 +36,18 @@ if(isset($_POST['prevDish'])) {
 
             //decide to show expl
             $showExpl = $_SESSION['showExpl'];
+
+            if (!isset($dish))
+            {
+                if ($showExpl = 0)
+                {
+                    $dish = "main";
+                }
+                else
+                {
+                    $dish = "main_exp";
+                }
+            }
 					
 			//Se nel Post e' presente la variabile dish, vuol dire che non e' stato effettuato l'accesso con myrror, oppure le ricette sono state gia' salvate in $data (quindi stiamo visualizzando un secondo o un dolce)
 			if(isset($_POST['dish'])){
@@ -281,7 +293,7 @@ if(isset($_POST['prevDish'])) {
 									<?php if($exp and ($showExpl>0)): ?>
 										<input type="hidden" name="prevChoice" id="prevChoice" value='<?= $_POST["Q1"] ?>' />
 									<?php endif; ?>
-									
+
 									<?php if($exp and ($showExpl>0))
                                     {
                                         include("php/questionnaire_exp.php");
@@ -295,32 +307,15 @@ if(isset($_POST['prevDish'])) {
 									<?php
 										switch($dish) {
 											case "main":
-											    if ($showExpl > 0)
-                                                {
-                                                    $dish = "main_exp";
-                                                }
-												else
-                                                {
-                                                    $dish = "second";
-                                                }
+                                                $dish = "second";
 												break;
 											case "main_exp":
-												$dish = "second";
+												$dish = "second_exp";
 												break;
 											case "second":
-											    if ($showExpl > 0)
-                                                {
-                                                    $dish = "second_exp";
-                                                }
-												else
-                                                {
-                                                    $dish = "dessert";
-                                                }
+                                                $dish = "dessert";
 												break;
 											case "second_exp":
-												$dish = "dessert";
-												break;
-											case "dessert":
 												$dish = "dessert_exp";
 												break;
 										}
