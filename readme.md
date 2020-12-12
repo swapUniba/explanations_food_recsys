@@ -1,72 +1,72 @@
 # Explanations Food RecSys
 
-Il sistema è costituito dal servizio Recommender, dal servizio Explanations e dalla web application.
-La cartella "foodWebApp" contiene i servizi Recommender ed Explanations.
-La cartella "foodrecsys2.1" contiene la web application "Rec Sys".
-La cartella "foodRecExp" contiene la web application "Rec Exp".
+The system consists of the Recommender service, the Explanations service and the web application.
+The "foodWebApp" folder contains the Recommender and Explanations services.
+The "foodrecsys2.1" folder contains the "Rec Sys" web application.
+The "foodRecExp" folder contains the "Rec Exp" web application.
 
 
-## Installazione
+## Installation
 
-Prima di avviare i servizi assicurati di utilizzare Python 3 e installa il microframework flask con il seguente comando
+Before starting the services make sure you are using Python 3 and install the flask microframework with the following command
 
 ```bash
     pip install flask flask-restful pandas
 ```
 
-## Servizio Recommender
+## Recommender Service
 
-Per avviare il Recommender esegui il comando
+To start the Recommender execute the command
 
 ```bash
     ./start_server.sh 
 ```
 
-Per arrestare il Recommender esegui il comando
+To stop the Recommender execute the command
 
 ```bash
     ./stop_server.sh 
 ```
 
-Per ulteriori informazioni sul servizio, leggi la documentazione del repo [FoodRecSys2020](https://github.com/swapUniba/FoodRecSys2020).
+For more information on the service, read the repo documentation [FoodRecSys2020](https://github.com/swapUniba/FoodRecSys2020).
 
 
-##Servizio Explanations
+## Explanations Service
 
-Per avviare il Explanations esegui il comando
+To start the Explanations service execute the command
 
 ```bash
     ./start_expl_server.sh 
 ```
 
-Per arrestare il Recommender esegui il comando
+To stop the Explanations service execute the command
 
 ```bash
     ./stop_expl_server.sh 
 ```
 
-All'interno del codice, potrai notare (nel main) alcuni array di stringhe contenenti i nomi delgli stili di spiegazione.
-Ci sono gli array con tutti i nomi identificativi degli stili implementati, e quelli utilizzati per la configurazione attuale del sistema. 
-Il servizio gira sulla porta 5003. Il servizio costruisce un JSON contenente nome dello stile e relativa spiegazione, per ciascuno stile. Il JSON è mandato alla web application tramite il protocollo HTTP.
+Inside the code, you will notice (in main) some arrays of strings containing the names of the explanation styles.
+There are arrays with all the identifying names of the implemented styles, and those used for the current system configuration.
+The service runs on port 5003. The service builds a JSON containing the name of the style and its explanation, for each style. The JSON is sent to the web application via the HTTP protocol.
 
 
 ## Web Application "Rec Exp"
 
-I linguaggi utilizzati per il suo sviluppo sono stati PHP, HTML5 e CSS.
+The languages used for its development were PHP, HTML5 and CSS.
 
-Essa è articolata in 5 pagine principali:
+It is divided into 5 main pages:
 
-    1)index.html, pagina di presentazione del sistema e del suo funzionamento;
-    2)form.html, pagina di inserimento delle informazioni dell’utente, che saranno utilizzate dal recommender e dall'explanations service;
-    3)recipes.php, pagina  che ha il compito di creare il profilo utente elaborando le informazioni ottenute, di richiedere i servizi del food recommender system ed explanations e di visualizzare i risultati all’utente con o senza spiegazione. Per una questione di organizzazione e migliore modularità del sistema si è previsto un modulo PHP esterno da includere e da cui richiamare le funzioni più complesse che eseguono i compiti appena descritti (/php/requestFunctions.php).
-    4)bye.php, pagina  che ha il compito di memorizzare i risultati dell’esperimento nel log dei risultati (/results/explResults.csv) e di comunicare all’utente la conclusione dell’esperimento senza errori.
+    1)index.html, presentation page of the system and its operation;
+    2)form.html, page for entering user information, which will be used by the recommender and the explanations service;
+    3)recipes.php, page that has the task of creating the user profile by processing the information obtained, requesting the services of the food recommender system and explanations and displaying the results to the user with or without explanation. For a matter of organization and better modularity of the system, an external PHP module has been provided to include and from which to call the more complex functions that perform the tasks just described (/php/requestFunctions.php).
+    4)bye.php, page that has the task of storing the results of the experiment in the results log (/results/explResults.csv) and to communicate to the user the conclusion of the experiment without errors.
 
 
-In questa configurazione la web app mostra sempre la spiegazione.
-Gli stili utilizzati sono quelli presenti nel codice e sono tutti di livello doppio, ossia spiegazioni con confronto tra due ricette.
+In this configuration the web app always shows the explanation.
+The styles used are those present in the code and are all double level, ie explanations with comparison between two recipes.
 
 
 ## Web Application "Rec Sys"
 
-La web application "Rec Sys" si differenzia dalla precedente in quanto per ogni utilizzo è generato random un valore (variabile ShowExpl in form.php).
-Tale valore stabilisce se la configurazione è senza spiegazione, con spiegazione di livello singolo, oppure con spiegazione di livello doppio.
+The "Rec Sys" web application differs from the previous one in that a value is generated randomly for each use (variable ShowExpl in form.php).
+This value determines whether the configuration is without explanation, with single level explanation, or with double level explanation.

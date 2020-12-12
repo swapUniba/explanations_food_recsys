@@ -6,8 +6,8 @@
     $typeExps = array(
         "popularity_two",
         "descriptions",
-	foodGoals_two",
-	"userLifestyle_two",
+	    "foodGoals_two",
+	    "userLifestyle_two",
         "foodFeatures_two",
         "foodFeatureHealthRisk_two",
         "foodFeatureHealthBenefits_two"    
