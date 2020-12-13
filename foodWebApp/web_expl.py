@@ -1885,32 +1885,10 @@ class Explain(Resource):
             "description"
         ]
 
-        # exps for the experiment
-        two_recipes_experiment = [
-            "popularity_two",
-            "descriptions",
-            "foodGoals_two",
-            "userLifestyle_two",
-            "foodFeatures_two",
-            "foodFeatureHealthRisk_two",
-            "foodFeatureHealthBenefits_two"
-        ]
-        one_recipe_experiment = [
-            "popularity_one",
-            "description",
-            "foodGoals_one",
-            "userLifestyle_one",
-            "foodFeatures_one",
-            "foodFeatureHealthRisk_one",
-            "foodFeatureHealthBenefits_one"
-        ]
-
-        # web app request a specific type of explanation for every recipe(use if u want that same type of exp is shown)
-        # type_explanation_requested = int(request.args.get('type'))
         explanations = {}
 
         expl = ""
-        for type_exp in one_recipe_experiment:
+        for type_exp in one_recipe:
             expl = get_str_exp_one(user,
                                    recipeA_values,
                                    type_exp,
@@ -1918,11 +1896,11 @@ class Explain(Resource):
                                    nutrients)
             if expl != "":
                 type_for_recipe_a = type_exp + "A"
-                explWithTypeA = {type_for_recipe_a : expl}
+                explWithTypeA = {type_for_recipe_a: expl}
                 explanations.update(explWithTypeA)
 
-        #expls b
-        for type_exp in one_recipe_experiment:
+        # expls b
+        for type_exp in one_recipe:
             expl = get_str_exp_one(user,
                                    recipeB_values,
                                    type_exp,
@@ -1930,11 +1908,11 @@ class Explain(Resource):
                                    nutrients)
             if expl != "":
                 type_for_recipe_B = type_exp + "B"
-                explWithTypeB = {type_for_recipe_B: expl}
-                explanations.update(explWithTypeB)
+                explWithTypeA = {type_for_recipe_B: expl}
+                explanations.update(explWithTypeA)
 
         expl = ""
-        for type_exp in two_recipes_experiment:
+        for type_exp in two_recipes:
             expl = get_str_exp_two(user,
                                    recipeA_values,
                                    recipeB_values,
