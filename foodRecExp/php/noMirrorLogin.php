@@ -5,12 +5,20 @@
 	//type of exps for experiment
     $typeExps = array(
         "popularity_two",
-        "descriptions",
-	    "foodGoals_two",
-	    "userLifestyle_two",
+        "foodGoals_two",
+        "foodPreferences_two",
         "foodFeatures_two",
+        "userSkills_two",
         "foodFeatureHealthRisk_two",
-        "foodFeatureHealthBenefits_two"    
+        "foodFeatureHealthBenefits_two",
+        "userFeatureHealthRisk_two",
+        "userFeatureHealthBenefits_two",
+        "userTime_two",
+        "userCosts_two",
+        "userLifestyle_two",
+        "userIngredients_two",
+        "userAge_two",
+        "descriptions"
      );
 
     //for the experiment I use a random exp, one of these random, different for every dish
