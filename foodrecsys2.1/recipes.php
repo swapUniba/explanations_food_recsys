@@ -294,14 +294,7 @@ if(isset($_POST['prevDish'])) {
 										<input type="hidden" name="prevChoice" id="prevChoice" value='<?= $_POST["Q1"] ?>' />
 									<?php endif; ?>
 
-									<?php if($exp and ($showExpl>0))
-                                    {
-                                        include("php/questionnaire_exp.php");
-                                    }
-                                    else
-                                    {
-                                        include("php/questionnaire.php");
-                                    }
+									<?php include("php/questionnaire.php");
 									    ?>
 									
 									<?php
