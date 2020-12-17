@@ -9,32 +9,56 @@
     //typeExps AB
     $typeExpsTwo = array(
         "popularity_two",
-        "descriptions",
         "foodGoals_two",
-        "userLifestyle_two",
+        "foodPreferences_two",
         "foodFeatures_two",
+        "userSkills_two",
         "foodFeatureHealthRisk_two",
-        "foodFeatureHealthBenefits_two"
+        "foodFeatureHealthBenefits_two",
+        "userFeatureHealthRisk_two",
+        "userFeatureHealthBenefits_two",
+        "userTime_two",
+        "userCosts_two",
+        "userLifestyle_two",
+        "userIngredients_two",
+        "userAge_two",
+        "descriptions"
     );
     //type exps single A
     $typeExpsOneA = array (
         "popularity_oneA",
-        "descriptionA",
         "foodGoals_oneA",
-        "userLifestyle_oneA",
+        "foodPreferences_oneA",
         "foodFeatures_oneA",
+        "userSkills_oneA",
         "foodFeatureHealthRisk_oneA",
-        "foodFeatureHealthBenefits_oneA"
+        "foodFeatureHealthBenefits_oneA",
+        "userFeatureHealthRisk_oneA",
+        "userFeatureHealthBenefits_oneA",
+        "userTime_oneA",
+        "userCosts_oneA",
+        "userLifestyle_oneA",
+        "userIngredients_oneA",
+        "userAge_oneA",
+        "descriptionA"
     );
     //type exps single B
     $typeExpsOneB = array (
         "popularity_oneB",
-        "descriptionB",
         "foodGoals_oneB",
-        "userLifestyle_oneB",
+        "foodPreferences_oneB",
         "foodFeatures_oneB",
+        "userSkills_oneB",
         "foodFeatureHealthRisk_oneB",
-        "foodFeatureHealthBenefits_oneB"
+        "foodFeatureHealthBenefits_oneB",
+        "userFeatureHealthRisk_oneB",
+        "userFeatureHealthBenefits_oneB",
+        "userTime_oneB",
+        "userCosts_oneB",
+        "userLifestyle_oneB",
+        "userIngredients_oneB",
+        "userAge_oneB",
+        "descriptionB"
     );
     //for the experiment I use a random exp, one of these random, different for every dish
     $expMainIndex = rand(0, count($typeExpsTwo) - 1);
@@ -51,7 +75,7 @@
     $dessertTypeExplB= "";
 
 
-	if($dish == "main"){
+	if(($dish == "main") || ($dish == "main_exp") ){
         $sex = $_POST['sexOption'];
         $age = $_POST['age'];
         $height = $_POST['height'];

@@ -1792,7 +1792,6 @@ class Explain(Resource):
 
         nutrientsPath = 'Nutrient.json'
         restrictionsPath = 'Restrictions.json'
-        print(request.args.get('imgurl1'))
 
         recipeA_url = request.args.get('imgurl1')
         recipeB_url = request.args.get('imgurl2')
@@ -1885,24 +1884,41 @@ class Explain(Resource):
             "description"
         ]
 
-        # exps for the experiment
+
+        # exps for the configuration
         two_recipes_experiment = [
             "popularity_two",
-            "descriptions",
             "foodGoals_two",
-            "userLifestyle_two",
+            "foodPreferences_two",
             "foodFeatures_two",
+            "userSkills_two",
             "foodFeatureHealthRisk_two",
-            "foodFeatureHealthBenefits_two"
+            "foodFeatureHealthBenefits_two",
+            "userFeatureHealthRisk_two",
+            "userFeatureHealthBenefits_two",
+            "userTime_two",
+            "userCosts_two",
+            "userLifestyle_two",
+            "userIngredients_two",
+            "userAge_two",
+            "descriptions"
         ]
         one_recipe_experiment = [
             "popularity_one",
-            "description",
             "foodGoals_one",
-            "userLifestyle_one",
+            "foodPreferences_one",
             "foodFeatures_one",
+            "userSkills_one",
             "foodFeatureHealthRisk_one",
-            "foodFeatureHealthBenefits_one"
+            "foodFeatureHealthBenefits_one",
+            "userFeatureHealthRisk_one",
+            "userFeatureHealthBenefits_one",
+            "userTime_one",
+            "userCosts_one",
+            "userLifestyle_one",
+            "userIngredients_one",
+            "userAge_one",
+            "description"
         ]
 
         # web app request a specific type of explanation for every recipe(use if u want that same type of exp is shown)
@@ -1930,8 +1946,8 @@ class Explain(Resource):
                                    nutrients)
             if expl != "":
                 type_for_recipe_B = type_exp + "B"
-                explWithTypeB = {type_for_recipe_B: expl}
-                explanations.update(explWithTypeB)
+                explWithTypeA = {type_for_recipe_B: expl}
+                explanations.update(explWithTypeA)
 
         expl = ""
         for type_exp in two_recipes_experiment:
@@ -1949,6 +1965,7 @@ class Explain(Resource):
 
         # conversion Array to JSON
         json_exp = json.dumps({'explanations': explanations})
+
 
         return json_exp
 

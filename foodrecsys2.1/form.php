@@ -3,7 +3,8 @@
 @session_start();
 //type of explanation
 //decide to show expl [ 0 ==> no explanation - 1 ==> single recipe explanations - 2 == double expl]
-$_SESSION['showExpl'] = rand(0, 2);
+$showExpl = rand(0, 2);
+$_SESSION['showExpl'] = $showExpl;
 $_SESSION['mainTypeExpl'] = "";
 $_SESSION['secondTypeExpl'] = "";
 $_SESSION['dessertTypeExpl'] = "";
@@ -393,7 +394,19 @@ $_SESSION['dessertTypeExplB'] = "";
                                         </div>
                                     </div>
 
-                                    <input type="hidden" name="dish" id="hiddenField" value="main" />
+                                    <?php
+                                    /* If the value of show expl show not 0 => start whith dish with explanations
+                                    in recipes.php */
+                                    if ($showExpl != 0)
+                                    {
+                                        $value = "main_exp";
+                                    }
+                                    else
+                                    {
+                                        $value = "main";
+                                    }
+                                    ?>
+                                    <input type="hidden" name="dish" id="hiddenField" value="<?= $value ?>" />
 
                                     <br>
                                     <div class="col-md-8 offset-md-2 form-btn text-center">
