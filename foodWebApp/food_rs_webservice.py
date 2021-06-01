@@ -60,7 +60,7 @@ class Mood(Resource):
 
             if score_low is not None:
                 if param < low:
-                    score_update = score_update * score_low   # TODO TypeError: unsupported operand type(s) for *: 'NoneType' and 'float'
+                    score_update = score_update * score_low
                 elif low < param < high:
                     score_update = score_update * score_mid
                 elif param > high:
@@ -173,8 +173,8 @@ class Mood(Resource):
                                           score_high=0.1)
 
             # carbohydrates
-            new_score = rescore_parameter(row.carbohydrates, new_score, low=18, high=54, score_low=None, score_mid=1.2,
-                                          score_high=1.5)   # TODO tartarello - score_low=None - perchè?
+            new_score = rescore_parameter(row.carbohydrates, new_score, low=18, high=54, score_low=0.1, score_mid=1.2,
+                                          score_high=1.5)
 
             # fibers
             new_score = rescore_parameter(row.fibers, new_score, low=1.65, high=4.95, score_low=0.1, score_mid=1.2,
@@ -192,7 +192,7 @@ class Mood(Resource):
             new_score = rescore_parameter(row.fat, new_score, low=4.65, high=13.95, score_low=3, score_mid=1,
                                           score_high=0.01)
             # carbohydrates
-            new_score = rescore_parameter(row.carbohydrates, new_score, low=18, high=54, score_low=None, score_mid=1,
+            new_score = rescore_parameter(row.carbohydrates, new_score, low=18, high=54, score_low=0.01, score_mid=1,
                                           score_high=2.5)
 
             # fibers
@@ -210,7 +210,7 @@ class Mood(Resource):
             new_score = rescore_parameter(row.fat, new_score, low=4.65, high=13.95, score_low=4, score_mid=0.9,
                                           score_high=0.001)
             # carbohydrates
-            new_score = rescore_parameter(row.carbohydrates, new_score, low=18, high=54, score_low=None, score_mid=0.9,
+            new_score = rescore_parameter(row.carbohydrates, new_score, low=18, high=54, score_low=0.001, score_mid=0.9,
                                           score_high=3.5)
 
             # fibers
