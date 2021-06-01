@@ -2126,9 +2126,7 @@ class Explain(Resource):
         nutrientsPath = 'Nutrient.json'
         restrictionsPath = 'Restrictions.json'
 
-        print(request.args)   # TODO tartarello - imgurl1 e imgurl2 in request.args sono vuoti
-
-        recipeA_url = request.args.get('imgurl1')   # TODO tartarello - recipeA_url è vuoto
+        recipeA_url = request.args.get('imgurl1')
         recipeB_url = request.args.get('imgurl2')
         url_dataset_en = 'dataset_en.csv'
 
@@ -2156,7 +2154,7 @@ class Explain(Resource):
             if row["imageURL"] == recipeB_url:
                 recipeB_values = row
 
-        recipeA_values["sodium"] = recipeA_values["sodium"] / 1000   # TODO tartarello -  KeyError: 'sodium'
+        recipeA_values["sodium"] = recipeA_values["sodium"] / 1000
         recipeB_values["sodium"] = recipeB_values["sodium"] / 1000
 
         recipeA_values["cholesterol"] = recipeA_values["cholesterol"] / 1000
