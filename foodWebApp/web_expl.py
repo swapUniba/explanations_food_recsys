@@ -1,30 +1,148 @@
-from functools import reduce
-
-from flask import Flask, request
+from flask import Flask
 from flask_restful import Resource, Api
-
-import re
-import csv
-import sys
-import json
-import random
-from datetime import datetime
-import numpy as np
+from flask import request, json
 import pandas as pd
-from random import choice
+import random
+import numpy as np
+from functools import reduce
 
 app = Flask(__name__)
 api = Api(app)
 
 app.debug = True
+"""
+http://127.0.0.1:5003/exp/?mood=neutral&stress=no&depression=no&bmi=over&activity=low&goal=lose&sleep=low&restr=glutenfree
+&imgurl1=https%3A%2F%2Fwww.giallozafferano.it%2Fimages%2Fricette%2F201%2F20113%2Ffoto_hd%2Fhd650x433_wm.jpg
+&imgurl2=https%3A%2F%2Fwww.giallozafferano.it%2Fimages%2Fricette%2F176%2F17635%2Ffoto_hd%2Fhd650x433_wm.jpg&difficulty=5
+&user_time=0&user_cost=5&health_style=5&health_condition=5&user_ingredients=0&user_age=U40
+"""
 
 
 class Explain(Resource):
     def get(self):
 
         # ---
-        # Explanation functions definitions
+        # The following sentence builder use all the same patterns of recipes, values, risks/benefits etc
+        # If you want to add new builders follow the same patterns for consistency
+        # If you want to change the sentences inside the functions you can freely do so, since it doesn't impact the
+        # function at all
         # ---
+
+        def sentence_builder_popularity(recipeA, recipeB, filter):
+            more_popular = " is more popular than "
+            as_popular = " is as popular as "
+            community = " in the community."
+            explanation = ""
+            if filter == "more popular":
+                explanation = recipeA + more_popular + recipeB + community
+            elif filter == "as popular":
+                explanation = recipeA + as_popular + recipeB + community
+
+            return explanation
+
+        def sentence_builder_food_goal(recipeA, recipeB, filter, caloriesA, caloriesB):
+            less_cal = " has less calories ("
+            more_cal = " has more calories ("
+            as_cal = " as caloric as"
+            explanation = ""
+            if filter == "less cal":
+                explanation = recipeA + less_cal + caloriesA + " Kcal) than " + recipeB + " (" + caloriesB
+            elif filter == "more cal":
+                explanation = recipeA + more_cal + caloriesA + " Kcal) than " + recipeB + " (" + caloriesB
+            elif filter == "as cal":
+                explanation = recipeA + as_cal + recipeB + ". Both recipes have " + caloriesA + " Kcal."
+
+            return explanation
+
+        def sentence_builder_food_features(recipeA, recipeB, valuesA, valuesB, ri, filter, stat):
+            explanation = ""
+            if recipeB is None:
+                if stat == "small":
+                    if filter == "saturated fat":
+                        explanation = recipeA + " has a smaller amount of saturated fats (" \
+                                      + valuesA + "gr) than reference daily intake (" + ri + " gr) "
+                    elif filter == "test":
+                        explanation = "test"
+                elif stat == "great":
+                    explanation = recipeA + " has a greater amount of saturated fats (" \
+                                  + valuesA + "gr) than reference daily intake (" + ri + " gr)"
+            else:
+                if stat == "small":
+                    if filter == "saturated fat":
+                        explanation = recipeA + " has a smaller amount of saturated fats (" \
+                                      + valuesA + "gr) than " + recipeB + "( " + valuesA + "/" + valuesB + " gr)."
+                    elif filter == "test":
+                        explanation = "test"
+                elif stat == "great":
+                    explanation = recipeA + " has a greater amount of saturated fats (" \
+                                  + valuesA + "gr) than " + recipeB + "( " + valuesA + "/" + valuesB + " gr)."
+
+            return explanation
+
+        def sentence_builder_food_risks_benefits(item, risk_benefit, filter, stat):
+            explanation = ""
+            if stat == "risk":
+                if filter == "saturatedFat":
+                    explanation = "too much intake of Saturated Fats can increase the risk of" + risk_benefit
+                elif filter == "carbohydrates":
+                    explanation = "too much intake of Carbohydrates can increase the risk of" + risk_benefit
+                elif filter == "sugars":
+                    explanation = "too much intake of Sugar can increase the risk of" + risk_benefit
+                elif filter == "fat":
+                    explanation = "too much intake of Fat can increase the risk of" + risk_benefit
+                elif filter == "fibers":
+                    explanation = "too much intake of Fibers can increase the risk of" + risk_benefit
+                elif filter == "cholesterol":
+                    explanation = "too much intake of Cholesterol can increase the risk of" + risk_benefit
+                elif filter == "sodium":
+                    explanation = "too much intake of Sodium can increase the risk of" + risk_benefit
+            else:
+                if filter == "saturatedFat":
+                    explanation = "A correct intake of Saturated Fats can" + risk_benefit
+                elif filter == "carbohydrates":
+                    explanation = "A correct intakeof Carbohydrates can " + risk_benefit
+                elif filter == "sugars":
+                    explanation = "A correct intake of Sugar can " + risk_benefit
+                elif filter == "fat":
+                    explanation = "A correct intake of Fat can " + risk_benefit
+                elif filter == "fibers":
+                    explanation = "A correct intake of Fibers can " + risk_benefit
+                elif filter == "cholesterol":
+                    explanation = "A correct intake of Cholesterol can " + risk_benefit
+                elif filter == "sodium":
+                    explanation = "A correct intake of Sodium can " + risk_benefit
+            return explanation
+
+        def sentence_builder_user_feature_risks(mood, bmi, depression, stress, great):
+            explanation = ""
+            if mood == "bad" or mood == "neutral" or depression == "yes" or stress == "yes":
+                listMood = ["sugars", "carbohydrates", "proteins"]
+                if great in listMood:
+                    explanation += "An excess of " + great + " can swing your mood. "
+
+            if bmi == "under":
+                explanation += "It may not be able to help you to gain weight. "
+            elif bmi == "over":
+                explanation += "It may not be able to help you to lose weight. "
+
+            return explanation
+
+        def sentence_builder_user_feature_benefits(mood, bmi, depression, stress, great, small):
+            explanation = ""
+            if mood == "bad" or mood == "neutral" or depression == "yes" or stress == "yes":
+                listMood = ["sugars", "carbohydrates", "proteins"]
+                if small in listMood:
+                    explanation += "A correct intake of " + small + " can improve your mood. "
+
+            if bmi == "under":
+                if great is not None:
+                    explanation += "A correct intake of " + great + " can help you to gain weight. "
+                if small is not None:
+                    explanation += "A correct intake of " + small + " can help you to gain weight. "
+            elif bmi == "over":
+                explanation += "A correct intake of " + small + " can help you to lose weight. "
+
+            return explanation
 
         """
         The Explanation function Popularity returns a static string
@@ -32,8 +150,8 @@ class Explain(Resource):
         """
 
         def popularity_one(recipeName):
-            explanation = ""
-            explanation = "I suggest you " + recipeName + \
+            ""
+            explanation = "I'd like to suggest you " + recipeName + \
                           " since it is very popular in the community."
             return explanation
 
@@ -43,17 +161,19 @@ class Explain(Resource):
         popular than the other.
         """
 
+
         def popularity_two(recipeA_name, recipeB_name, recipeA_rc, recipeB_rc):
             explanation = ""
 
-            if (recipeA_rc > recipeB_rc):
-                explanation = recipeA_name + " is more popular than " + recipeB_name + " in the community."
-            if (recipeB_rc > recipeA_rc):
-                explanation = recipeB_name + " is more popular than " + recipeA_name + " in the community."
-            if (recipeA_rc == recipeB_rc):
-                explanation = recipeA_name + " is as popular as " + recipeB_name + " in the community."
+            if recipeA_rc > recipeB_rc:
+                explanation = sentence_builder_popularity(recipeA_name, recipeB_name, "more popular")
+            if recipeB_rc > recipeA_rc:
+                explanation = sentence_builder_popularity(recipeB_name, recipeA_name, "more popular")
+            if recipeA_rc == recipeB_rc:
+                explanation = sentence_builder_popularity(recipeA_name, recipeB_name, "as popular")
 
             return explanation
+
 
         """
         The explanation function foodGoals_one take in input the name of the recipe,
@@ -67,12 +187,12 @@ class Explain(Resource):
             explanation = ""
             explanation = recipeName + " has " + recipe_calories + " Kcal. "
 
-            if (user_goal == "lose"):
+            if user_goal == "lose":
                 explanation += "It is a good choice, since you want to lose weight."
-            elif (user_goal == "gain"):
+            elif user_goal == "gain":
                 explanation += "It is a good choice, since you want to gain weight."
-            elif (user_goal == "no"):
-                explanation += "The average calorie intake for a person like you is 1900 Kcal."
+            elif user_goal == "no":
+                explanation += "The average calorie intake for a person of your characteristics is 1900 Kcal."
             return explanation
 
         """
@@ -86,43 +206,43 @@ class Explain(Resource):
         def foodGoals_two(user_goal, recipeA_name, recipeB_name, recipeA_calories, recipeB_calories):
             explanation = ""
 
-            if (recipeA_calories > recipeB_calories):
-                if (user_goal == "lose"):
-                    explanation = recipeB_name + " has less calories (" + str(
-                        recipeB_calories) + " Kcal) than " + recipeA_name + " (" + str(recipeA_calories) + " Kcal). "
+            if recipeA_calories > recipeB_calories:
+                if user_goal == "lose":
+                    explanation = sentence_builder_food_goal(recipeB_name, recipeA_name, "less cal",
+                                                             str(recipeB_calories), str(recipeA_calories))
                     explanation += "It can help you reaching your goal of losing weight."
 
-                elif (user_goal == "gain"):
-                    explanation = recipeA_name + " has more calories (" + str(
-                        recipeA_calories) + " Kcal) than " + recipeB_name + " (" + str(recipeB_calories) + " Kcal). "
+                elif user_goal == "gain":
+                    explanation = sentence_builder_food_goal(recipeA_name, recipeB_name, "more cal",
+                                                             str(recipeA_calories), str(recipeB_calories))
                     explanation += "It can help you reaching your goal of gaining weight."
 
-                elif (user_goal == "no"):
-                    explanation = recipeA_name + " has more calories (" + str(
-                        recipeA_calories) + " Kcal) than " + recipeB_name + " (" + str(recipeB_calories) + " Kcal). "
-                    explanation += "The average calorie intake for a person like you is 1900 Kcal."
+                elif user_goal == "no":
+                    explanation = sentence_builder_food_goal(recipeA_name, recipeB_name, "more cal",
+                                                             str(recipeA_calories), str(recipeB_calories))
+                    explanation += "The average calorie intake for a person of your characteristics is 1900 Kcal."
 
-            elif (recipeA_calories < recipeB_calories):
+            elif recipeA_calories < recipeB_calories:
 
-                if (user_goal == "lose"):
-                    explanation = recipeA_name + " has less calories (" + str(
-                        recipeA_calories) + " Kcal) than " + recipeB_name + " (" + str(recipeB_calories) + " Kcal). "
+                if user_goal == "lose":
+                    explanation = sentence_builder_food_goal(recipeA_name, recipeB_name, "less cal",
+                                                             str(recipeA_calories), str(recipeB_calories))
                     explanation += "It can help you reaching your goal of losing weight."
 
-                elif (user_goal == "gain"):
-                    explanation = recipeB_name + " has more calories (" + str(
-                        recipeB_calories) + " Kcal) than " + recipeA_name + " (" + str(recipeA_calories) + " Kcal). "
+                elif user_goal == "gain":
+                    explanation = sentence_builder_food_goal(recipeB_name, recipeA_name, "more cal",
+                                                             str(recipeB_calories), str(recipeA_calories))
                     explanation += "It can help you reaching your goal of gaining weight."
 
-                elif (user_goal == "no"):
-                    explanation = recipeB_name + " has more calories (" + str(
-                        recipeB_calories) + " Kcal) than " + recipeA_name + " (" + str(recipeA_calories) + " Kcal). "
-                    explanation += "The average calorie intake for a person like you is 1900 Kcal."
+                elif user_goal == "no":
+                    explanation = sentence_builder_food_goal(recipeB_name, recipeA_name, "more cal",
+                                                             str(recipeB_calories), str(recipeA_calories))
+                    explanation += "The average calorie intake for a person of your characteristics is 1900 Kcal."
 
             else:
-                explanation = recipeA_name + " is as caloric as " + recipeB_name + ". Both recipes have " + str(
-                    recipeA_calories) + " Kcal."
-                explanation += "The average calorie intake for a person like you is 1900 Kcal."
+                explanation = sentence_builder_food_goal(recipeA_name, recipeB_name, "as cal", str(recipeA_calories),
+                                                         None)
+                explanation += "The average calorie intake for a person of your characteristics is 1900 Kcal."
 
             return explanation
 
@@ -164,7 +284,7 @@ class Explain(Resource):
 
         def foodFeatures_one(recipe_values, nutrients):
             explanation = ""
-            small = ""
+            filter = ""
             great = ""
 
             smallList = []
@@ -176,59 +296,97 @@ class Explain(Resource):
             recipeName = recipe_values["title"]
 
             for item in listNutrients:
-                if (not (np.isnan(recipe_values[item]))):
-                    if (recipe_values[item] <= nutrients[item]["RI"]):
+                if not (np.isnan(recipe_values[item])):
+                    if recipe_values[item] <= nutrients[item]["RI"]:
                         smallList.append(item)
                     else:
                         greatList.append(item)
 
-            if (smallList != []):
-                small = smallList[0]
-                strSmall = small
+            if smallList:
+                for item in smallList:
+                    pivot = 0
+                    small = smallList[pivot]
 
-                if (small == "saturatedFat"):
-                    strSmall = "saturated fats"
-                explanation = recipeName + " has a smaller amount of " + strSmall + " (" + str(
-                    recipe_values[small]) + " gr)" + \
-                              " than reference daily intake (" + str(nutrients[small]["RI"]) + " gr)"
-                if (greatList != []):
-                    great = greatList[0]
-                    strGreat = great
-
-                    if (great == "saturatedFat"):
-                        strGreat = "saturated fats"
-                    explanation += " and an excess of " + strGreat + " (" + str(recipe_values[great]) + " gr)" + \
-                                   " than reference daily intake (" + str(nutrients[great]["RI"]) + " gr). "
-                else:
-                    explanation += " and there isn't higher amount of nutrients than reference daily intake. "
-
-            if (greatList != []):
-                great = greatList[0]
-                strGreat = great
-
-                if (great == "saturatedFat"):
-                    strGreat = "saturated fats"
-                explanation = recipeName + " has an excess amount of " + strGreat + " (" + str(
-                    recipe_values[great]) + " gr)" + \
-                              " than reference daily intake (" + str(nutrients[great]["RI"]) + " gr)"
-                if (smallList != []):
-                    small = smallList[0]
-                    strSmall = small
-
-                    if (small == "saturatedFat"):
-                        strSmall = "saturated fats"
-                    explanation += " and a smaller amount of " + strSmall + " (" + str(recipe_values[small]) + " gr)" + \
-                                   " than reference daily intake (" + str(nutrients[small]["RI"]) + " gr). "
+                    if small == "saturatedFat":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[small]), None,
+                                                                      str(nutrients[small]["RI"]), "saturated fat",
+                                                                      "small")
+                    elif small == "carbohydrates":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[small]), None,
+                                                                      str(nutrients[small]["RI"]), "carbohydrates",
+                                                                      "small")
+                    elif small == "sugars":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[small]), None,
+                                                                      str(nutrients[small]["RI"]), "sugars",
+                                                                      "small")
+                    elif small == "fat":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[small]), None,
+                                                                      str(nutrients[small]["RI"]), "fat",
+                                                                      "small")
+                    elif small == "fibers":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[small]), None,
+                                                                      str(nutrients[small]["RI"]), "fibers",
+                                                                      "small")
+                    elif small == "cholesterol":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[small]), None,
+                                                                      str(nutrients[small]["RI"]), "cholesterol",
+                                                                      "small")
+                    elif small == "sodium":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[small]), None,
+                                                                      str(nutrients[small]["RI"]), "sodium",
+                                                                      "small")
+                    else:
+                        explanation += " and there isn't higher amount of nutrients than reference daily intake. "
+                    pivot = pivot + 1
+            if greatList:
+                for item in greatList:
+                    pivot = 0
+                    great = greatList[pivot]
+                    if great == "saturatedFat":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[great]), None,
+                                                                      str(nutrients[great]["RI"]), "saturated fat",
+                                                                      "great")
+                    elif great == "carbohydrates":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[great]),
+                                                                      None,
+                                                                      str(nutrients[great]["RI"]), "carbohydrates",
+                                                                      "great")
+                    elif great == "sugars":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[great]),
+                                                                      None,
+                                                                      str(nutrients[great]["RI"]), "sugars",
+                                                                      "great")
+                    elif great == "fat":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[great]),
+                                                                      None,
+                                                                      str(nutrients[great]["RI"]), "fat",
+                                                                      "great")
+                    elif great == "fibers":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[great]),
+                                                                      None,
+                                                                      str(nutrients[great]["RI"]), "fibers",
+                                                                      "great")
+                    elif great == "cholesterol":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[great]),
+                                                                      None,
+                                                                      str(nutrients[great]["RI"]), "cholesterol",
+                                                                      "great")
+                    elif great == "sodium":
+                        explanation += sentence_builder_food_features(recipeName, None, str(recipe_values[great]),
+                                                                      None,
+                                                                      str(nutrients[great]["RI"]), "sodium",
+                                                                      "great")
                 else:
                     explanation += " and there isn't lower amount of nutrients than reference daily intake. "
-
-            return explanation, small, great
+                pivot = pivot + 1
+            return explanation, smallList, greatList
 
         """
         The explanation function foodFeatures_two compares nutrients (calories
         and sugars) of the two recipes. 
 
         """
+
         def foodFeatures_two(recipeA, recipeB, nutrients):
             recipeA_name = recipeA["title"]
             recipeB_name = recipeB["title"]
@@ -262,65 +420,86 @@ class Explain(Resource):
             greatList = []
 
             for item in listNutrients:
-                if (not (np.isnan(recipeA[item])) and not (np.isnan(recipeB[item]))):
-                    if (recipeA[item] < recipeB[item]):
+                if not (np.isnan(recipeA[item])) and not (np.isnan(recipeB[item])):
+                    if recipeA[item] < recipeB[item]:
                         smallList.append(item)
-                    if (recipeA[item] > recipeB[item]):
+                    if recipeA[item] > recipeB[item]:
                         greatList.append(item)
+                print("small")
+                print(smallList)
+                print("great")
+                print(greatList)
+            if smallList:
+                for item in smallList:
+                    pivot = 0
+                    small = smallList[pivot]
 
-            if (smallList != []):
-                small = smallList[0]
-                strSmall = small
+                    if small == "saturatedFat":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[small]),
+                                                                      str(recipeB[small]),
+                                                                      None, "saturated fat", "small")
+                    elif small == "carbohydrates":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[small]),
+                                                                      str(recipeB[small]), None, "carbohydrates",
+                                                                      "small")
+                    elif small == "sugars":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[small]),
+                                                                      str(recipeB[small]), None, "sugars",
+                                                                      "small")
+                    elif small == "fat":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[small]),
+                                                                      str(recipeB[small]), None, "fat",
+                                                                      "small")
+                    elif small == "fibers":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[small]),
+                                                                      str(recipeB[small]), None, "fibers",
+                                                                      "small")
+                    elif small == "cholesterol":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[small]),
+                                                                      str(recipeB[small]), None, "cholesterol",
+                                                                      "small")
+                    elif small == "sodium":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[small]),
+                                                                      str(recipeB[small]), None, "sodium",
+                                                                      "small")
+                    else:
+                        explanation += " and there isn't higher amount of nutrients than reference daily intake. "
+                pivot = pivot + 1
+            if greatList:
+                for item in greatList:
+                    pivot = 0
+                    great = greatList[pivot]
 
-                if (small == "saturatedFat"):
-                    strSmall = "saturated fats"
-                explanation = recipeA_name + " has a lower amount of " + \
-                              strSmall + " (" + str(recipeA[small]) + \
-                              " gr)"
-                if (greatList != []):
-                    great = greatList[0]
-                    strGreat = great
-
-                    if (great == "saturatedFat"):
-                        strGreat = "saturated fats"
-
-                    explanation += " and a higher amount of " + strGreat + \
-                                   " (" + str(recipeA[great]) + " gr) than " + \
-                                   recipeB_name + \
-                                   "(" + strSmall + ": " + str(recipeB[small]) + \
-                                   " gr, " + strGreat + ": " + str(recipeB[great]) + \
-                                   " gr). "
-                else:
-                    explanation += " than " + recipeB_name + " (" + strSmall + ": " + str(
-                        recipeB[small]) + " gr), and there isn't higher amount of nutrients than " + recipeB_name + ". "
-
-            if (greatList != []):
-                great = greatList[0]
-                strGreat = great
-
-                if (great == "saturatedFat"):
-                    strGreat = "saturated fats"
-                explanation = recipeA_name + " has a higher amount of " + \
-                              strGreat + " (" + str(recipeA[great]) + \
-                              " gr)"
-                if (smallList != []):
-                    small = smallList[0]
-                    strSmall = small
-
-                    if (small == "saturatedFat"):
-                        strSmall = "saturated fats"
-
-                    explanation += " and a lower amount of " + \
-                                   strSmall + " (" + str(recipeA[small]) + \
-                                   " gr) than " + recipeB_name + " (" + strGreat + ": " + \
-                                   str(recipeB[great]) + " gr" + ", " + strSmall + ": " + \
-                                   str(recipeB[small]) + " gr). "
-                else:
-                    explanation += " than " + recipeB_name + "(" + strGreat + ": " + \
-                                   str(recipeB[
-                                           great]) + " gr), and there isn't lower amount of nutrients than " + recipeB_name + ". "
-
-            return explanation, small, great
+                    if great == "saturatedFat":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[great]),
+                                                                      str(recipeB[great]),
+                                                                      None, "saturated fat", "great")
+                    elif great == "carbohydrates":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[great]),
+                                                                      str(recipeB[great]), None, "carbohydrates",
+                                                                      "great")
+                    elif great == "sugars":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[great]),
+                                                                      str(recipeB[great]), None, "sugars",
+                                                                      "great")
+                    elif great == "fat":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[great]),
+                                                                      str(recipeB[great]), None, "fat",
+                                                                      "great")
+                    elif great == "fibers":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[great]),
+                                                                      str(recipeB[great]), None, "fibers",
+                                                                      "great")
+                    elif great == "cholesterol":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[great]),
+                                                                      str(recipeB[great]), None, "cholesterol",
+                                                                      "great")
+                    elif great == "sodium":
+                        explanation += sentence_builder_food_features(recipeA_name, recipeB_name, str(recipeA[great]),
+                                                                      str(recipeB[great]), None, "sodium",
+                                                                      "great")
+                    pivot = pivot + 1
+            return explanation, smallList, greatList
 
         """
         The explanation function userSkills_one take as input the user cooking experience
@@ -330,19 +509,19 @@ class Explain(Resource):
 
         def userSkills_one(user_exp, recipe_name):
             explanation = ""
-            if (user_exp == 1):
+            if user_exp == 1:
                 explanation = recipe_name + " is rated by the users as very simple to prepare, " + \
                               "and it is adequate to your cooking skills, which are very low."
-            elif (user_exp == 2):
+            elif user_exp == 2:
                 explanation = recipe_name + " is rated by the users as simple to prepare, " + \
                               "and it is adequate to your cooking skills, which are low"
-            elif (user_exp == 3):
+            elif user_exp == 3:
                 explanation = recipe_name + " is rated by the users as quite simple to prepare, " + \
                               "and it is adequate to your cooking skills, which are medium"
-            elif (user_exp == 4):
+            elif user_exp == 4:
                 explanation = recipe_name + " is rated by the users as difficult to prepare, " + \
                               "and it is adequate to your cooking skills, which are high"
-            elif (user_exp == 5):
+            elif user_exp == 5:
                 explanation = recipe_name + " is rated by the users as very difficult to prepare, " + \
                               "and it is adequate to your cooking skills, which are very high."
             return explanation
@@ -359,73 +538,69 @@ class Explain(Resource):
 
             explanation = ""
 
-            if (diffA == "molto facile"):
+            if diffA == "molto facile":
                 diffA = 1
-            elif (diffA == "facile"):
+            elif diffA == "facile":
                 diffA = 2
-            elif (diffA == "media"):
+            elif diffA == "media":
                 diffA = 3
-            elif (diffA == "difficile"):
+            elif diffA == "difficile":
                 diffA = 4
-            elif (diffA == "molto difficile"):
+            elif diffA == "molto difficile":
                 diffA = 5
 
-            if (diffB == "molto facile"):
+            if diffB == "molto facile":
                 diffB = 1
-            elif (diffB == "facile"):
+            elif diffB == "facile":
                 diffB = 2
-            elif (diffB == "media"):
+            elif diffB == "media":
                 diffB = 3
-            elif (diffB == "difficile"):
+            elif diffB == "difficile":
                 diffB = 4
-            elif (diffB == "molto difficile"):
+            elif diffB == "molto difficile":
                 diffB = 5
 
-            if (user_skills == 1):
-                if (diffA < diffB):
+            if user_skills == 1:
+                if diffA < diffB:
                     explanation = recipeA + " is rated by the users as easier to prepare than " + recipeB + \
                                   ", and this is adequate with your cooking skills, which are very low."
-                elif (diffB < diffA):
+                elif diffB < diffA:
                     explanation = recipeB + " is rated by the users as easier to prepare than " + recipeA + \
                                   ", and this is adequate with your cooking skills, which are very low."
                 else:
                     explanation = recipeA + " is as easy to prepare as " + recipeB + "."
-
-            if (user_skills == 2):
-                if (diffA < diffB):
+            elif user_skills == 2:
+                if diffA < diffB:
                     explanation = recipeA + " is rated by the users as easier to prepare than " + recipeB + \
                                   ", and this is adequate with your cooking skills, which are low."
-                elif (diffB < diffA):
+                elif diffB < diffA:
                     explanation = recipeB + " is rated by the users as easier to prepare than " + recipeA + \
                                   ", and this is adequate with your cooking skills, which are low."
                 else:
                     explanation = recipeA + " is as easy to prepare as " + recipeB + "."
-
-            if (user_skills == 3):
-                if (diffA < diffB):
+            elif user_skills == 3:
+                if diffA < diffB:
                     explanation = recipeA + " is rated by the users as easier to prepare than " + recipeB + \
                                   ", and this is adequate with your cooking skills, which are medium."
-                elif (diffB < diffA):
+                elif diffB < diffA:
                     explanation = recipeB + " is rated by the users as easier to prepare than " + recipeA + \
                                   ", and this is adequate with your cooking skills, which are medium."
                 else:
                     explanation = recipeA + " is as easy to prepare as " + recipeB + "."
-
-            if (user_skills == 4):
-                if (diffA < diffB):
+            elif user_skills == 4:
+                if diffA < diffB:
                     explanation = recipeA + " is rated by the users as easier to prepare than " + recipeB + \
                                   ", and this is adequate with your cooking skills, which are high."
-                elif (diffB < diffA):
+                elif diffB < diffA:
                     explanation = recipeB + " is rated by the users as easier to prepare than " + recipeA + \
                                   ", and this is adequate with your cooking skills, which are high."
                 else:
                     explanation = recipeA + " is as easy to prepare as " + recipeB + "."
-
-            if (user_skills == 5):
-                if (diffA < diffB):
+            elif user_skills == 5:
+                if diffA < diffB:
                     explanation = recipeA + " is rated by the users as easier to prepare than " + recipeB + \
                                   ", and this is adequate with your cooking skills, which are very high."
-                elif (diffB < diffA):
+                elif diffB < diffA:
                     explanation = recipeB + " is rated by the users as easier to prepare than " + recipeA + \
                                   ", and this is adequate with your cooking skills, which are very high."
                 else:
@@ -449,19 +624,43 @@ class Explain(Resource):
             risk = ""
 
             explanation, small, great = foodFeatures_one(recipe_values, nutrients)
-
-            if (great != ""):
-                risk = random.choice(nutrients[great]["risks"])
-                if (great == "saturatedFat"):
-                    great = "saturated fats"
-                explanation += " Intake too much " + great + \
-                               " can increase the risk of " + risk + "."
-            elif small != "":
-                risk = random.choice(nutrients[small]["risks"])
-                if (small == "saturatedFat"):
-                    small = "saturated fats"
-                explanation += " Intake too much " + small + \
-                               " can increase the risk of " + risk + "."
+            for item in great:
+                risk = ""
+                risk = random.choice(nutrients[item]["risks"])
+                if item == "saturatedFat":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "saturated fat", "risk")
+                elif item == "carbohydrates":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "carbohydrates", "risk")
+                elif item == "sugars":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "sugars", "risk")
+                elif item == "fat":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "fat", "risk")
+                elif item == "fibers":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "fibers", "risk")
+                elif item == "cholesterol":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "cholesterol", "risk")
+                elif item == "sodium":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "sodium", "risk")
+            for item in small:
+                risk = ""
+                print("start item small food risk 1")
+                print(item)
+                risk = random.choice(nutrients[item]["risks"])
+                print(risk)
+                if item == "saturatedFat":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "saturated fat", "risk")
+                elif item == "carbohydrates":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "carbohydrates", "risk")
+                elif item == "sugars":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "sugars", "risk")
+                elif item == "fat":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "fat", "risk")
+                elif item == "fibers":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "fibers", "risk")
+                elif item == "cholesterol":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "cholesterol", "risk")
+                elif item == "sodium":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "sodium", "risk")
 
             return explanation
 
@@ -485,20 +684,46 @@ class Explain(Resource):
 
             explanation, small, great = foodFeatures_two(recipeA, recipeB, nutrients)
 
-            if (small != ""):
-                risk = random.choice(nutrients[small]["risks"])
-                if (small == 'saturatedFat'):
-                    small = 'saturated fats'
-                explanation += "Intake too much " + small + \
-                               " can increase the risk of " + risk + ". "
-            if (great != ""):
-                risk = random.choice(nutrients[great]["risks"])
-                if (great == 'saturatedFat'):
-                    great = 'saturated fats'
-                explanation += " Intake too much " + great + \
-                               " can increase the risk of " + risk + ". "
+            for item in great:
+                risk = ""
+                print("start item great risk 2 ")
+                print(item)
+                print(random.choice(nutrients[item]["risks"]))
+                risk = random.choice(nutrients[item]["risks"])
+                pivot = 0
+                if item == "saturatedFat":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "saturated fat", "risk")
+                elif item == "carbohydrates":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "carbohydrates", "risk")
+                elif item == "sugars":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "sugars", "risk")
+                elif item == "fat":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "fat", "risk")
+                elif item == "fibers":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "fibers", "risk")
+                elif item == "cholesterol":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "cholesterol", "risk")
+                elif item == "sodium":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "sodium", "risk")
+            for item in small:
+                risk = ""
+                risk = random.choice(nutrients[item]["risks"])
+                if item == "saturatedFat":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "saturated fat", "risk")
+                elif item == "carbohydrates":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "carbohydrates", "risk")
+                elif item == "sugars":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "sugars", "risk")
+                elif item == "fat":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "fat", "risk")
+                elif item == "fibers":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "fibers", "risk")
+                elif item == "cholesterol":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "cholesterol", "risk")
+                elif item == "sodium":
+                    explanation += sentence_builder_food_risks_benefits(item, risk, "sodium", "risk")
 
-            if (np.isnan(recipeA['calories']) or np.isnan(recipeB['calories'])):
+            if np.isnan(recipeA['calories']) or np.isnan(recipeB['calories']):
                 explanation += ""
             elif (recipeA["calories"]) > recipeB["calories"]:
                 explanation += "Furthermore, " + recipeA_name + " has more calories (" + str(
@@ -526,23 +751,46 @@ class Explain(Resource):
             explanation = ""
             small = ""
             great = ""
-            risk = ""
 
             explanation, small, great = foodFeatures_one(recipe_values, nutrients)
-
-            if (small != ""):
-                benefit = random.choice(nutrients[small]["benefits"])
-                if (small == "saturatedFat"):
-                    small = "saturated fats"
-                explanation += " A correct daily intake of " + small + \
-                               " can " + benefit + "."
-            elif great != "":
-                benefit = random.choice(nutrients[great]["benefits"])
-                if (great == "saturatedFat"):
-                    great = "saturated fats"
-                explanation += " A correct daily intake of " + great + \
-                               " can " + benefit + "."
-
+            for item in great:
+                benefits = ""
+                print("start benefits 1 greats ")
+                print(item)
+                benefits = random.choice(nutrients[item]["benefits"])
+                if item == "saturatedFat":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "saturated fat", "benefits")
+                elif item == "carbohydrates":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "carbohydrates", "benefits")
+                elif item == "sugars":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "sugars", "benefits")
+                elif item == "fat":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "fat", "benefits")
+                elif item == "fibers":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "fibers", "benefits")
+                elif item == "cholesterol":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "cholesterol", "benefits")
+                elif item == "sodium":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "sodium", "benefits")
+            for item in small:
+                benefits = ""
+                print("start benefits 1 smalls ")
+                print(item)
+                benefits = random.choice(nutrients[item]["benefits"])
+                if item == "saturatedFat":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "saturated fat", "benefits")
+                elif item == "carbohydrates":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "carbohydrates", "benefits")
+                elif item == "sugars":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "sugars", "benefits")
+                elif item == "fat":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "fat", "benefits")
+                elif item == "fibers":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "fibers", "benefits")
+                elif item == "cholesterol":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "cholesterol", "benefits")
+                elif item == "sodium":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "sodium", "benefits")
             return explanation
 
         """
@@ -566,20 +814,42 @@ class Explain(Resource):
 
             explanation, small, great = foodFeatures_two(recipeA, recipeB, nutrients)
 
-            if (small != ""):
-                benefit = random.choice(nutrients[small]["benefits"])
-                if (small == 'saturatedFat'):
-                    small = 'saturated fats'
-                explanation += "A correct daily intake of " + small + \
-                               " can " + benefit + ". "
-            if (great != ""):
-                benefit = random.choice(nutrients[great]["benefits"])
-                if (great == 'saturatedFat'):
-                    great = 'saturated fats'
-                explanation += "A correct daily intake of " + great + \
-                               " can " + benefit + ". "
+            for item in great:
+                benefits = ""
+                benefits = random.choice(nutrients[item]["benefits"])
+                if item == "saturatedFat":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "saturated fat", "benefits")
+                elif item == "carbohydrates":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "carbohydrates", "benefits")
+                elif item == "sugars":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "sugars", "benefits")
+                elif item == "fat":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "fat", "benefits")
+                elif item == "fibers":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "fibers", "benefits")
+                elif item == "cholesterol":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "cholesterol", "benefits")
+                elif item == "sodium":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "sodium", "benefits")
+            for item in small:
+                benefits = ""
+                benefits = random.choice(nutrients[item]["benefits"])
+                if item == "saturatedFat":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "saturated fat", "benefits")
+                elif item == "carbohydrates":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "carbohydrates", "benefits")
+                elif item == "sugars":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "sugars", "benefits")
+                elif item == "fat":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "fat", "benefits")
+                elif item == "fibers":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "fibers", "benefits")
+                elif item == "cholesterol":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "cholesterol", "benefits")
+                elif item == "sodium":
+                    explanation += sentence_builder_food_risks_benefits(item, benefits, "sodium", "benefits")
 
-            if (np.isnan(recipeA['calories']) or np.isnan(recipeB['calories'])):
+            if np.isnan(recipeA['calories']) or np.isnan(recipeB['calories']):
                 explanation += ""
             elif (recipeA["calories"]) > recipeB["calories"]:
                 explanation += "Furthermore, " + recipeA_name + " has more calories (" + str(
@@ -606,17 +876,9 @@ class Explain(Resource):
 
             explanation, small, great = foodFeatures_one(recipe_values, nutrients)
 
-            if (explanation != ""):
-                if (user["Mood"] == 'bad' or user["Mood"] == 'neutral' or user["Depressed"] == 'yes' or user[
-                    "Stressed"] == 'yes'):
-                    listMood = ["sugars", "carbohydrates", "proteins"]
-                    if (great in listMood):
-                        explanation += "An excess of " + great + " can swing your mood. "
-
-                if (user["BMI"] == "under"):
-                    explanation += "It may not be able to help you to gain weight. "
-                elif (user["BMI"] == "over"):
-                    explanation += "It may not be able to help you to lose weight. "
+            if explanation != "":
+                explanation += sentence_builder_user_feature_risks(user["Mood"], user["BMI"], user["Depressed"],
+                                                                   user["Stressed"], great)
 
             return explanation
 
@@ -638,19 +900,11 @@ class Explain(Resource):
             recipeB_name = recipeB["title"]
             explanation, smallA, greatA = foodFeatures_two(recipeA, recipeB, nutrients)
 
-            if (explanation != ""):
-                if (user["Mood"] == 'bad' or user["Mood"] == 'neutral' or user["Depressed"] == 'yes' or user[
-                    "Stressed"] == 'yes'):
-                    listMood = ["sugars", "carbohydrates", "proteins"]
-                    if (greatA in listMood):
-                        explanation += "An excess of " + greatA + " can swing your mood. "
+            if explanation != "":
+                explanation += sentence_builder_user_feature_risks(user["Mood"], user["BMI"], user["Depressed"],
+                                                                   user["Stressed"], greatA)
 
-                if (user["BMI"] == "under" and greatA != ""):
-                    explanation += "It may not be able to help you to gain weight. "
-                elif (user["BMI"] == "over" and smallA != ""):
-                    explanation += "It may not be able to help you to lose weight. "
-
-                if (np.isnan(recipeA['calories']) or np.isnan(recipeB['calories'])):
+                if np.isnan(recipeA['calories']) or np.isnan(recipeB['calories']):
                     explanation += ""
                 elif (recipeA["calories"]) > recipeB["calories"]:
                     explanation += "Also, " + recipeA_name + " has more calories (" + str(
@@ -679,20 +933,11 @@ class Explain(Resource):
 
             explanation, small, great = foodFeatures_one(recipe_values, nutrients)
 
-            if (user["Mood"] == 'bad' or user["Mood"] == 'neutral' or user["Depressed"] == 'yes' or user[
-                "Stressed"] == 'yes'):
-                listMood = ["sugars", "carbohydrates", "proteins"]
-                if (small in listMood):
-                    explanation += "A correct intake of " + small + " can improve your mood. "
+            if great and small is not None:
+                explanation += sentence_builder_user_feature_benefits(user["Mood"], user["BMI"], user["Depressed"],
+                                                                  user["Stressed"], random.choice(great),
+                                                                  random.choice(small))
 
-            if (user["BMI"] == "under"):
-                if (great != ""):
-                    explanation += "A correct intake of " + great + " can help you to gain weight. "
-                if (small != ""):
-                    explanation += "A correct intake of " + small + " can help you to gain weight. "
-
-            elif (user["BMI"] == "over"):
-                explanation += "A correct intake of " + small + " can help you to lose weight. "
 
             return explanation
 
@@ -706,27 +951,18 @@ class Explain(Resource):
         def userFeatureHealthBenefits_two(user, recipeA, recipeB, nutrients):
 
             explanation = ""
-            smallA = ""
-            greatA = ""
 
             recipeA_name = recipeA["title"]
             recipeB_name = recipeB["title"]
 
             explanation, smallA, greatA = foodFeatures_two(recipeA, recipeB, nutrients)
 
-            if (explanation != ""):
-                if (user["Mood"] == 'bad' or user["Mood"] == 'neutral' or user["Depressed"] == 'yes' or user[
-                    "Stressed"] == 'yes'):
-                    listMood = ["sugar", "carbohydrates", "proteins"]
-                    if (smallA in listMood):
-                        explanation += "A correct intake of " + smallA + " can improve your mood. "
+            if explanation != "":
+                explanation += sentence_builder_user_feature_benefits(user["Mood"], user["BMI"], user["Depressed"],
+                                                                      user["Stressed"], random.choice(greatA),
+                                                                      random.choice(smallA))
 
-                if (user["BMI"] == "under" and greatA != ""):
-                    explanation += "A correct intake of " + greatA + " can help you to gain weight. "
-                elif (user["BMI"] == "over" and smallA != ""):
-                    explanation += "A correct intake of " + smallA + " can help you to lose weight. "
-
-                if (np.isnan(recipeA['calories']) or np.isnan(recipeB['calories'])):
+                if np.isnan(recipeA['calories']) or np.isnan(recipeB['calories']):
                     explanation += ""
 
                 elif (recipeA["calories"]) > recipeB["calories"]:
@@ -866,6 +1102,7 @@ class Explain(Resource):
         """
 
         def userCosts_two(user_cost, recipeA_values, recipeB_values):
+            global user_cost_str
             explanation = ""
             costs_dict = {1: "very low", 2: "low", 3: "medium", 4: "high"}
             costs_dictRev = {"very low": 1, "low": 2, "medium": 3, "high": 4}
@@ -881,7 +1118,7 @@ class Explain(Resource):
             if user_cost != 5:
                 user_cost_str = costs_dict[user_cost]
 
-            if ((recipeA_values["cost"] != "") and (recipeB_values["cost"] != "")):
+            if (recipeA_values["cost"] != "") and (recipeB_values["cost"] != ""):
                 # if the user cost is 5, it means that for the user the cost is not important, so we show only the cost
                 # level of the recommended recipe
                 if recipeA_cost == recipeB_cost:
@@ -931,8 +1168,8 @@ class Explain(Resource):
                                    + " doesn't allow to maintain your lifestyle, because" \
                                    + " it's a " + score_level_str + " recipe (In according to FSA guidelines). You " \
                                                                     "probably have a very " \
-                                                       "healthy lifestyle and therefore these recipes are slightly " \
-                                                       "less healthy than the ones you usually choose."
+                                                                    "healthy lifestyle and therefore these recipes are slightly " \
+                                                                    "less healthy than the ones you usually choose."
             elif user_health_lifestyle == user_health_condition:
                 # user wants to maintain the lifestyle
                 explanation = "You want to maintain your lifestyle, "
@@ -947,8 +1184,8 @@ class Explain(Resource):
                                    + " doesn't allow to maintain your lifestyle, because" \
                                    + " it's a " + score_level_str + " recipe (In according to FSA guidelines). " \
                                                                     "You probably have a very " \
-                                                       "healthy lifestyle and therefore these recipes are slightly " \
-                                                       "less healthy than the ones you usually choose."
+                                                                    "healthy lifestyle and therefore these recipes are slightly " \
+                                                                    "less healthy than the ones you usually choose."
             else:
                 # user wants a worst lifestyle. since this can be an error, we don't show this in the string
                 if score_level_cmp > user_health_condition:
@@ -960,8 +1197,8 @@ class Explain(Resource):
                 else:
                     explanation = recipe_values['title'] + " doesn't allow to maintain your lifestyle, because" \
                                   + " it's a " + score_level_str + " recipe. You probably have a very " \
-                                                       "healthy lifestyle and therefore these recipes are slightly " \
-                                                       "less healthy than the ones you usually choose."
+                                                                   "healthy lifestyle and therefore these recipes are slightly " \
+                                                                   "less healthy than the ones you usually choose."
 
             return explanation
 
@@ -1005,15 +1242,15 @@ class Explain(Resource):
                     explanation = "Both recipes make your lifestyle worse, but " + \
                                   recipeA_values['title'] + " is quite healthier than " + recipeB_values['title'] \
                                   + " (in according to FSA guidelines). You probably have a very " \
-                                                       "healthy lifestyle and therefore these recipes are slightly " \
-                                                       "less healthy than the ones you usually choose."
+                                    "healthy lifestyle and therefore these recipes are slightly " \
+                                    "less healthy than the ones you usually choose."
                 elif scoreA_level_cmp < scoreB_level_cmp:
                     # recipeB is better
                     explanation = "Both recipes make your lifestyle worse, but " + \
                                   recipeB_values['title'] + " is quite healthier than " + recipeA_values['title'] \
                                   + " (in according to FSA guidelines). You probably have a very " \
-                                                       "healthy lifestyle and therefore these recipes are slightly " \
-                                                       "less healthy than the ones you usually choose."
+                                    "healthy lifestyle and therefore these recipes are slightly " \
+                                    "less healthy than the ones you usually choose."
                 else:
                     explanation = "Both recipes make your lifestyle worse, since they are " \
                                   + scoreA_level_str + " (in according to FSA guidelines). You probably have a very " \
@@ -1114,9 +1351,9 @@ class Explain(Resource):
             favIngredientsInRecipe = list(dict.fromkeys(favIngredientsInRecipe))
             # remove empty strings
             if "" in favIngredientsInRecipe:
-                favIngredientsInRecipe.remove("");
+                favIngredientsInRecipe.remove("")
             if " " in favIngredientsInRecipe:
-                favIngredientsInRecipe.remove(" ");
+                favIngredientsInRecipe.remove(" ")
 
             if len(favIngredientsInRecipe) > 0:
                 if len(favIngredientsInRecipe) == 1:
@@ -1155,9 +1392,9 @@ class Explain(Resource):
             favIngredientsInRecipeA = list(dict.fromkeys(favIngredientsInRecipeA))
             # remove empty strings
             if "" in favIngredientsInRecipeA:
-                favIngredientsInRecipeA.remove("");
+                favIngredientsInRecipeA.remove("")
             if " " in favIngredientsInRecipeA:
-                favIngredientsInRecipeA.remove(" ");
+                favIngredientsInRecipeA.remove(" ")
 
             recipeB_ingredients_str = recipeB_values['ingredients']
             # clean string
@@ -1176,9 +1413,9 @@ class Explain(Resource):
             favIngredientsInRecipeB = list(dict.fromkeys(favIngredientsInRecipeB))
             # remove empty strings
             if "" in favIngredientsInRecipeB:
-                favIngredientsInRecipeB.remove("");
+                favIngredientsInRecipeB.remove("")
             if " " in favIngredientsInRecipeA:
-                favIngredientsInRecipeB.remove(" ");
+                favIngredientsInRecipeB.remove(" ")
 
             if (len(favIngredientsInRecipeA) > 0) or (len(favIngredientsInRecipeB) > 0):
 
@@ -1196,7 +1433,7 @@ class Explain(Resource):
                         explanation += " which are some of your favourite ingredients, compared to " \
                                        + recipeB_values['title'] + "which doesn't contain any favourite ingredients."
 
-                elif (len(favIngredientsInRecipeA) == 0):
+                elif len(favIngredientsInRecipeA) == 0:
                     # recipe A doesn't "contain" any fav ingredient
                     explanation = recipeB_values['title'] + " contains "
                     if len(favIngredientsInRecipeB) == 1:
@@ -1224,6 +1461,7 @@ class Explain(Resource):
 
                     explanation += recipeB_values['title'] + " which contains "
                     if len(favIngredientsInRecipeB) == 1:
+                        #
                         # recipe B contains just 1 of fav ingredients
                         explanation += favIngredientsInRecipeB[0]
                         explanation += "."
@@ -1241,6 +1479,7 @@ class Explain(Resource):
         """
 
         def userAge_one(user_age, recipe_values):
+
             explanation = ""
             # we build sets of ingredients with certain characteristics (for example rich in calcium) to evaluate
             # if the recipes contain them
@@ -1271,6 +1510,10 @@ class Explain(Resource):
             # from https://www.myfooddata.com/articles/high-vitamin-D-foods.php
             richVitaminDList = ["salmon", "chestnut", "milk", "soy milk", "tofu",
                                 "yogurt", "breakfast cereal", "orange juice", "pork chops", "eggs"]
+            under_20_motivation = " In your age group, calcium intake is important to help the bones reach their " \
+                                  "maximum development. In addition, it is important to take iron to support " \
+                                  "metabolism, improve concentration, improve oxygen transfer to the muscles " \
+                                  "and produce hormones."
             under_30_motivation = " In your age group, calcium intake is important to help the bones reach their " \
                                   "maximum development. In addition, it is important to take iron to support " \
                                   "metabolism, improve concentration, improve oxygen transfer to the muscles " \
@@ -1284,7 +1527,51 @@ class Explain(Resource):
             over_50_motivation = " In your age group, calcium intake is important to counteract bone loss. It is " \
                                  "also important to take vitamin D."
 
-            if user_age == "U30":
+            if user_age == 'U20':
+                print("enter u20 single")
+                # in this age group we want recipes that contain ingredients rich in calcium and iron
+                calciumIngredientsInRecipe = isRichIn(richCalciumList, recipe_values)
+                ironIngredientsInRecipe = isRichIn(richIronList, recipe_values)
+                print(calciumIngredientsInRecipe)
+                print(ironIngredientsInRecipe)
+
+                # define explanation
+                if (len(calciumIngredientsInRecipe) > 0) and (len(ironIngredientsInRecipe) > 0):
+                    explanation = recipe_values['title'] + " contains "
+                    if len(calciumIngredientsInRecipe) == 1:
+                        explanation += calciumIngredientsInRecipe[0] + " which is an ingredient rich in calcium, "
+                    else:
+                        # concatenate list of ingredients separated by ',' to the explanation
+                        explanation += str(reduce(lambda x, y: x + "," + y, calciumIngredientsInRecipe))
+                        explanation += " which are ingredients rich in calcium, "
+                    explanation = " and "
+                    if len(ironIngredientsInRecipe) == 1:
+                        explanation += ironIngredientsInRecipe[0] + " which is an ingredient rich in iron. "
+                    else:
+                        # concatenate list of ingredients separated by ',' to the explanation
+                        explanation += str(reduce(lambda x, y: x + "," + y, ironIngredientsInRecipe))
+                        explanation += " which are ingredients rich in iron. "
+                    explanation += under_30_motivation
+                elif len(calciumIngredientsInRecipe) > 0:
+                    explanation = recipe_values['title'] + " contains "
+                    if len(calciumIngredientsInRecipe) == 1:
+                        explanation += calciumIngredientsInRecipe[0] + " which is an ingredient rich in calcium. "
+                    else:
+                        # concatenate list of ingredients separated by ',' to the explanation
+                        explanation += str(reduce(lambda x, y: x + "," + y, calciumIngredientsInRecipe))
+                        explanation += " which are ingredients rich in calcium. "
+                    explanation += under_30_motivation
+                elif len(ironIngredientsInRecipe) > 0:
+                    explanation = recipe_values['title'] + " contains "
+                    if len(ironIngredientsInRecipe) == 1:
+                        explanation += ironIngredientsInRecipe[0] + " which is an ingredient rich in iron. "
+                    else:
+                        # concatenate list of ingredients separated by ',' to the explanation
+                        explanation += str(reduce(lambda x, y: x + "," + y, ironIngredientsInRecipe))
+                        explanation += "which are ingredients rich in iron. "
+                    explanation += under_20_motivation
+            elif user_age == 'U30':
+                print("enter u30 single")
                 # in this age group we want recipes that contain ingredients rich in calcium and iron
                 calciumIngredientsInRecipe = isRichIn(richCalciumList, recipe_values)
                 ironIngredientsInRecipe = isRichIn(richIronList, recipe_values)
@@ -1323,10 +1610,11 @@ class Explain(Resource):
                         explanation += str(reduce(lambda x, y: x + "," + y, ironIngredientsInRecipe))
                         explanation += "which are ingredients rich in iron. "
                     explanation += under_30_motivation
+            if user_age == 'U40':
 
-            if user_age == "U40":
                 # in this age group we want recipes that contain ingredients rich in magnesium
                 magnesiumIngredientsInRecipe = isRichIn(richMagnesiumList, recipe_values)
+                print(magnesiumIngredientsInRecipe)
                 if len(magnesiumIngredientsInRecipe) > 0:
                     explanation = recipe_values['title'] + " contains "
                     if len(magnesiumIngredientsInRecipe) == 1:
@@ -1336,8 +1624,8 @@ class Explain(Resource):
                         explanation += str(reduce(lambda x, y: x + "," + y, magnesiumIngredientsInRecipe))
                         explanation += "which are ingredients rich in magnesium. "
                     explanation += under_40_motivation
-
-            if user_age == "U50":
+            if user_age == 'U50':
+                print("enter u50 single")
                 # in this age group we want recipes that contain ingredients rich in vitamin C and E, and antioxidants
                 antioxidantIngredientsInRecipe = isRichIn(richAntioxidantList, recipe_values)
                 vitaminCIngredientsInRecipe = isRichIn(richVitaminCList, recipe_values)
@@ -1359,8 +1647,8 @@ class Explain(Resource):
                         explanation += str(reduce(lambda x, y: x + "," + y, vitaminEIngredientsInRecipe))
                         explanation += "(rich in vitamin E). "
                     explanation += under_50_motivation
-
-            if (user_age == "U60") or (user_age == "060"):
+            if (user_age == 'U60') or (user_age == '060'):
+                print("enter u60 single")
                 # in this age group we want recipes that contain ingredients rich in calcium and vitamin D
                 vitaminDIngredientsInRecipe = isRichIn(richVitaminDList, recipe_values)
                 calciumIngredientsInRecipe = isRichIn(richCalciumList, recipe_values)
@@ -1401,8 +1689,10 @@ class Explain(Resource):
                         explanation += " which are ingredients rich in vitamin D. "
                     explanation += over_50_motivation
 
-            explanation = explanation.replace('[', "")
-            explanation = explanation.replace(']', "")
+            explanation = explanation.replace('[', '')
+            explanation = explanation.replace(']', '')
+            print("exit one")
+            print(explanation)
             return explanation
 
         """
@@ -1411,6 +1701,9 @@ class Explain(Resource):
         """
 
         def userAge_two(user_age, recipeA_values, recipeB_values):
+            print("user age two")
+            print(user_age)
+            print(type(user_age))
             explanation = ""
             # from https://www.myfooddata.com/articles/foods-high-in-calcium.php
             richCalciumList = ["tofu", "milk", "yogurt", "parmesan", "spinach",
@@ -1440,6 +1733,10 @@ class Explain(Resource):
             richVitaminDList = ["salmon", "chestnut", "milk", "soy milk", "tofu",
                                 "yogurt", "breakfast cereal", "orange juice", "pork chops", "eggs"]
             # Motivations for every age group
+            under_20_motivation = " In your age group, calcium intake is important to help the bones reach their " \
+                                  "maximum development. In addition, it is important to take iron to support " \
+                                  "metabolism, improve concentration, improve oxygen transfer to the muscles " \
+                                  "and produce hormones."
             under_30_motivation = " In your age group, calcium intake is important to help the bones reach their " \
                                   "maximum development. In addition, it is important to take iron to support " \
                                   "metabolism, improve concentration, improve oxygen transfer to the muscles " \
@@ -1452,8 +1749,8 @@ class Explain(Resource):
                                   "many chronic diseases."
             over_50_motivation = " In your age group, calcium intake is important to counteract bone loss. It is " \
                                  "also important to take vitamin D."
-
-            if user_age == "U30":
+            if user_age == 'U20':
+                print("enter u20 double")
                 # int this age we want food that contain calcium and iron
                 u30IngredientsFeatureList = richCalciumList + richIronList
                 u30IngredientsFeatureList = list(dict.fromkeys(u30IngredientsFeatureList))
@@ -1472,25 +1769,26 @@ class Explain(Resource):
                     explanation += " and " + recipeB_values['title'] + " contains "
                     # concatenate list of ingredients separated by ',' to the explanation
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
-                    explanation += under_30_motivation
                 elif len(goodIngredientsInRecipeA) > 0:
                     explanation = recipeA_values['title'] + " compared to " + recipeB_values['title'] + " contains "
                     # concatenate list of ingredients separated by ',' to the explanation
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeA)) + ". "
-                    explanation += under_30_motivation
                 elif len(goodIngredientsInRecipeB) > 0:
                     explanation = recipeB_values['title'] + " compared to " + recipeA_values['title'] + " contains "
                     # concatenate list of ingredients separated by ',' to the explanation
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
-                    explanation += under_30_motivation
-            if user_age == "U40":
-                # in this age we want ingredients wich are rich in magnesium
-                u40IngredientsFeatureList = richMagnesiumList
-                u40IngredientsFeatureList = list(dict.fromkeys(u40IngredientsFeatureList))
-                goodIngredientsInRecipeA = isRichIn(u40IngredientsFeatureList, recipeA_values)
+                explanation += under_30_motivation
+            elif user_age == 'U30':
+                print("enter u30 double")
+                # int this age we want food that contain calcium and iron
+                u30IngredientsFeatureList = richCalciumList + richIronList
+                u30IngredientsFeatureList = list(dict.fromkeys(u30IngredientsFeatureList))
+                # ingredients in recipe A that are rich in calcium or iron
+                goodIngredientsInRecipeA = isRichIn(u30IngredientsFeatureList, recipeA_values)
 
-                goodIngredientsInRecipeB = isRichIn(u40IngredientsFeatureList, recipeB_values)
-                # define explanation
+                # ingredients in recipe B that are rich in calcium or iron
+                goodIngredientsInRecipeB = isRichIn(u30IngredientsFeatureList, recipeB_values)
+
                 # define explanation
                 if (len(goodIngredientsInRecipeA) > 0) and (len(goodIngredientsInRecipeB) > 0):
                     # both recipes contain good ingredients for the user age
@@ -1500,18 +1798,46 @@ class Explain(Resource):
                     explanation += " and " + recipeB_values['title'] + " contains "
                     # concatenate list of ingredients separated by ',' to the explanation
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
-                    explanation += under_40_motivation
+                elif len(goodIngredientsInRecipeA) > 0:
+                    explanation = recipeA_values['title'] + " compared to " + recipeB_values['title'] + " contains "
+                    # concatenate list of ingredients separated by ',' to the explanation
+                    explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeA)) + ". "
+                elif len(goodIngredientsInRecipeB) > 0:
+                    explanation = recipeB_values['title'] + " compared to " + recipeA_values['title'] + " contains "
+                    # concatenate list of ingredients separated by ',' to the explanation
+                    explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
+                explanation += under_30_motivation
+            elif user_age == 'U40':
+                print("enter u40 double")
+                # in this age we want ingredients wich are rich in magnesium
+                u40IngredientsFeatureList = richMagnesiumList
+                u40IngredientsFeatureList = list(dict.fromkeys(u40IngredientsFeatureList))
+                goodIngredientsInRecipeA = isRichIn(u40IngredientsFeatureList, recipeA_values)
+
+                goodIngredientsInRecipeB = isRichIn(u40IngredientsFeatureList, recipeB_values)
+                # define explanation
+                print(u40IngredientsFeatureList)
+                print(goodIngredientsInRecipeA)
+                print(goodIngredientsInRecipeB)
+                if (len(goodIngredientsInRecipeA) > 0) and (len(goodIngredientsInRecipeB) > 0):
+                    # both recipes contain good ingredients for the user age
+                    explanation = recipeA_values['title'] + " contains "
+                    # concatenate list of ingredients separated by ',' to the explanation
+                    explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeA))
+                    explanation += " and " + recipeB_values['title'] + " contains "
+                    # concatenate list of ingredients separated by ',' to the explanation
+                    explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
                 elif len(goodIngredientsInRecipeA) > 0:
                     explanation = recipeA_values['title'] + " versus " + recipeB_values['title'] + " contains "
                     # concatenate list of ingredients separated by ',' to the explanation
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeA)) + ". "
-                    explanation += under_40_motivation
                 elif len(goodIngredientsInRecipeB) > 0:
                     explanation = recipeB_values['title'] + " versus " + recipeA_values['title'] + " contains "
                     # concatenate list of ingredients separated by ',' to the explanation
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
-                    explanation += under_40_motivation
-            if user_age == "U50":
+                explanation += under_40_motivation
+            elif user_age == 'U50':
+                print("enter u50 double")
                 # we want ingredients rich in vitamin c and e and antioxidants
                 u50IngredientsFeatureList = richAntioxidantList + richVitaminCList + richVitaminEList
                 u50IngredientsFeatureList = list(dict.fromkeys(u50IngredientsFeatureList))
@@ -1541,8 +1867,8 @@ class Explain(Resource):
                     # concatenate list of ingredients separated by ',' to the explanation
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
                     explanation += under_50_motivation
-
-            if (user_age == "U60") or (user_age == "060"):
+            elif (user_age == 'U60') or (user_age == '060'):
+                print("enter u60 double")
                 # in this age group we want ingredients that are rich in calcium and vitamin d
                 o60IngredientsFeatureList = richCalciumList + richVitaminDList
                 o60IngredientsFeatureList = list(dict.fromkeys(o60IngredientsFeatureList))
@@ -1552,6 +1878,7 @@ class Explain(Resource):
                 # ingredients in recipe B that are good
                 goodIngredientsInRecipeB = isRichIn(o60IngredientsFeatureList, recipeB_values)
 
+                # define explanation
                 # define explanation
                 if (len(goodIngredientsInRecipeA) > 0) and (len(goodIngredientsInRecipeB) > 0):
                     # both recipes contain good ingredients for the user age
@@ -1573,8 +1900,10 @@ class Explain(Resource):
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
                     explanation += over_50_motivation
 
-            explanation = explanation.replace('[', "")
-            explanation = explanation.replace(']', "")
+            explanation = explanation.replace('[', '')
+            explanation = explanation.replace(']', '')
+            print("exit two")
+            print(explanation)
             return explanation
 
         def isRichIn(ingredientsListRichsIn, recipe_values):
@@ -1591,6 +1920,8 @@ class Explain(Resource):
                         richInRecipe.append(ingredient)
             # remove duplicates
             richInRecipe = list(dict.fromkeys(richInRecipe))
+            print("rich")
+            print(richInRecipe)
             return richInRecipe
 
         # -----
@@ -1602,6 +1933,7 @@ class Explain(Resource):
                             type_explanation,
                             listRestrictions,
                             nutrients):
+            global description
             expl = ''
             recipeName = recipe_values['title']
 
@@ -1621,15 +1953,15 @@ class Explain(Resource):
                     random.shuffle(listRestrictions)
                     i = 0
                     # encoded(vegetarian,lactosefree,glutenfree,lownichel,light)
-                    while (flag == 0 and i < len(listRestrictions)):
-                        if (listRestrictions[i] in userRestrictions):
+                    while flag == 0 and i < len(listRestrictions):
+                        if listRestrictions[i] in userRestrictions:
                             restriction = listRestrictions[i]
                             description = restrictions["one"][restriction]
-                            if (listRestrictions[i] == "lactosefree"):
+                            if listRestrictions[i] == "lactosefree":
                                 restriction = "lactose-free"
-                            if (listRestrictions[i] == "glutenfree"):
+                            if listRestrictions[i] == "glutenfree":
                                 restriction = "gluten-free"
-                            if (listRestrictions[i] == "lownichel"):
+                            if listRestrictions[i] == "lownichel":
                                 restriction = "low-nichel"
                             flag = 1
 
@@ -1658,7 +1990,7 @@ class Explain(Resource):
                 expl = userTime_one(user_time, recipe_values)
             elif type_explanation == 'userCosts_one':
                 user_costs = int(user['User_cost'])
-                if (recipe_values['cost'] == ""):
+                if recipe_values['cost'] == "":
                     expl = ""
                 else:
                     expl = userCosts_one(user_costs, recipe_values)
@@ -1687,6 +2019,7 @@ class Explain(Resource):
                             listRestrictions,
                             nutrients):
 
+            global description
             expl = ''
             recipeA_name = recipeA_values['title']
             recipeB_name = recipeB_values['title']
@@ -1697,7 +2030,7 @@ class Explain(Resource):
 
                 expl = popularity_two(recipeA_name, recipeB_name, recipeA_rc, recipeB_rc)
 
-            elif type_explanation == 'foodGoals_two':
+            if type_explanation == 'foodGoals_two':
                 user_goal = user['Goal']
                 recipeA_calories = recipeA_values['calories']
                 recipeB_calories = recipeB_values['calories']
@@ -1708,25 +2041,25 @@ class Explain(Resource):
                                      recipeA_calories,
                                      recipeB_calories)
 
-            elif type_explanation == 'foodPreferences_two':
+            if type_explanation == 'foodPreferences_two':
                 restriction = ""
                 userRestrictions = user["User_restriction"]
-                if (userRestrictions is None):
+                if userRestrictions is None:
                     expl = ""
                 else:
                     flag = 0
                     random.shuffle(listRestrictions)
                     i = 0
 
-                    while (flag == 0 and i < len(listRestrictions)):
-                        if (listRestrictions[i] in userRestrictions):
+                    while flag == 0 and i < len(listRestrictions):
+                        if listRestrictions[i] in userRestrictions:
                             restriction = listRestrictions[i]
                             description = restrictions["two"][restriction]
-                            if (listRestrictions[i] == "lactosefree"):
+                            if listRestrictions[i] == "lactosefree":
                                 restriction = "lactose-free"
-                            if (listRestrictions[i] == "glutenfree"):
+                            if listRestrictions[i] == "glutenfree":
                                 restriction = "gluten-free"
-                            if (listRestrictions[i] == "lownichel"):
+                            if listRestrictions[i] == "lownichel":
                                 restriction = "low-nichel"
                             flag = 1
 
@@ -1734,12 +2067,12 @@ class Explain(Resource):
 
                     expl = foodPreferences_two(restriction, description)
 
-            elif type_explanation == 'foodFeatures_two':
+            if type_explanation == 'foodFeatures_two':
                 expl, _, _ = foodFeatures_two(recipeA_values,
                                               recipeB_values,
                                               nutrients)
 
-            elif type_explanation == 'userSkills_two':
+            if type_explanation == 'userSkills_two':
                 user_skills = int(user['Cooking_exp'])
                 diffA = recipeA_values['difficulty']
                 diffB = recipeB_values['difficulty']
@@ -1749,41 +2082,41 @@ class Explain(Resource):
                                       diffA,
                                       diffB)
 
-            elif type_explanation == 'foodFeatureHealthRisk_two':
+            if type_explanation == 'foodFeatureHealthRisk_two':
                 expl = foodFeatureHealthRisk_two(recipeA_values, recipeB_values, nutrients)
-            elif type_explanation == 'foodFeatureHealthBenefits_two':
+            if type_explanation == 'foodFeatureHealthBenefits_two':
                 expl = foodFeatureHealthBenefits_two(recipeA_values, recipeB_values, nutrients)
-            elif type_explanation == 'userFeatureHealthRisk_two':
+            if type_explanation == 'userFeatureHealthRisk_two':
                 expl = userFeatureHealthRisk_two(user, recipeA_values, recipeB_values, nutrients)
-            elif type_explanation == 'userFeatureHealthBenefits_two':
+            if type_explanation == 'userFeatureHealthBenefits_two':
                 expl = userFeatureHealthBenefits_two(user, recipeA_values, recipeB_values, nutrients)
 
             # new expls
-            elif type_explanation == 'userTime_two':
+            if type_explanation == 'userTime_two':
                 user_time = int(user['User_time'])
                 expl = userTime_two(user_time, recipeA_values, recipeB_values)
 
-            elif type_explanation == 'userCosts_two':
+            if type_explanation == 'userCosts_two':
                 user_costs = int(user['User_cost'])
                 if (recipeA_values['cost'] == "") and (recipeB_values['cost'] == ""):
                     expl = ""
                 else:
                     expl = userCosts_two(user_costs, recipeA_values, recipeB_values)
 
-            elif type_explanation == 'userLifestyle_two':
+            if type_explanation == 'userLifestyle_two':
                 user_health_lifestyle = int(user['Health_style'])
                 user_health_condition = int(user['Health_condition'])
                 expl = userLifestyle_two(user_health_lifestyle, user_health_condition, recipeA_values, recipeB_values)
-            elif type_explanation == 'userIngredients_two':
+            if type_explanation == 'userIngredients_two':
                 user_ingredients = user['User_ingredients'].split("-")
                 if user_ingredients is None:
                     expl = ""
                 else:
                     expl = userIngredients_two(user_ingredients, recipeA_values, recipeB_values)
-            elif type_explanation == 'userAge_two':
+            if type_explanation == 'userAge_two':
                 user_age = user['Age']
                 expl = userAge_two(user_age, recipeA_values, recipeB_values)
-            elif type_explanation == 'descriptions':
+            if type_explanation == 'descriptions':
                 if (recipeA_values['description'] != "") and (recipeB_values['description'] != ""):
                     expl = recipeA_values['description'] + recipeB_values['description']
             return expl
@@ -1793,7 +2126,9 @@ class Explain(Resource):
         nutrientsPath = 'Nutrient.json'
         restrictionsPath = 'Restrictions.json'
 
-        recipeA_url = request.args.get('imgurl1')
+        print(request.args)   # TODO tartarello - imgurl1 e imgurl2 in request.args sono vuoti
+
+        recipeA_url = request.args.get('imgurl1')   # TODO tartarello - recipeA_url è vuoto
         recipeB_url = request.args.get('imgurl2')
         url_dataset_en = 'dataset_en.csv'
 
@@ -1816,12 +2151,12 @@ class Explain(Resource):
         recipeB_values = {}
 
         for index, row in df.iterrows():
-            if (row["imageURL"] == recipeA_url):
+            if row["imageURL"] == recipeA_url:
                 recipeA_values = row
-            if (row["imageURL"] == recipeB_url):
+            if row["imageURL"] == recipeB_url:
                 recipeB_values = row
 
-        recipeA_values["sodium"] = recipeA_values["sodium"] / 1000
+        recipeA_values["sodium"] = recipeA_values["sodium"] / 1000   # TODO tartarello -  KeyError: 'sodium'
         recipeB_values["sodium"] = recipeB_values["sodium"] / 1000
 
         recipeA_values["cholesterol"] = recipeA_values["cholesterol"] / 1000
@@ -1843,7 +2178,8 @@ class Explain(Resource):
             'Goal': request.args.get('goal'),  # lose/gain/no
             'User_restriction': request.args.get('restr'),
             # encoded(vegetarian,lactosefree,glutenfree,lownichel,light)
-            'User_ingredients': request.args.get('user_ingredients')
+            'User_ingredients': request.args.get('user_ingredients'),
+            'Sex': request.args.get('sex')
         }
 
         two_recipes = [
@@ -1884,7 +2220,6 @@ class Explain(Resource):
             "description"
         ]
 
-
         # exps for the configuration
         two_recipes_experiment = [
             "popularity_two",
@@ -1924,9 +2259,12 @@ class Explain(Resource):
         # web app request a specific type of explanation for every recipe(use if u want that same type of exp is shown)
         # type_explanation_requested = int(request.args.get('type'))
         explanations = {}
-
+        #type_exp = one_recipe_experiment[random.randint(0, 13)]
+        type_exp = "userAge_one"
+        print(type_exp)
         expl = ""
-        for type_exp in one_recipe_experiment:
+        """
+           for type_exp in one_recipe_experiment:
             expl = get_str_exp_one(user,
                                    recipeA_values,
                                    type_exp,
@@ -1934,11 +2272,23 @@ class Explain(Resource):
                                    nutrients)
             if expl != "":
                 type_for_recipe_a = type_exp + "A"
-                explWithTypeA = {type_for_recipe_a : expl}
+                explWithTypeA = {type_for_recipe_a: expl}
                 explanations.update(explWithTypeA)
+        """
 
-        #expls b
-        for type_exp in one_recipe_experiment:
+        expl = get_str_exp_one(user, recipeA_values, type_exp, listRestrictions, nutrients)
+        if expl != "":
+            type_for_recipe_a = type_exp + "A"
+            explWithTypeA = {type_for_recipe_a: expl}
+            explanations.update(explWithTypeA)
+
+        # expls b
+        expl = get_str_exp_one(user, recipeB_values, type_exp, listRestrictions, nutrients)
+        if expl != "":
+            type_for_recipe_b = type_exp + "B"
+            explWithTypeB = {type_for_recipe_b: expl}
+            explanations.update(explWithTypeB)
+        """for type_exp in one_recipe_experiment:
             expl = get_str_exp_one(user,
                                    recipeB_values,
                                    type_exp,
@@ -1948,9 +2298,21 @@ class Explain(Resource):
                 type_for_recipe_B = type_exp + "B"
                 explWithTypeA = {type_for_recipe_B: expl}
                 explanations.update(explWithTypeA)
+"""
 
         expl = ""
-        for type_exp in two_recipes_experiment:
+        type_exp = two_recipes_experiment[random.randint(0, 13)]
+        expl = get_str_exp_two(user,
+                               recipeA_values,
+                               recipeB_values,
+                               type_exp,
+                               listRestrictions,
+                               nutrients)
+        if expl != "":
+            explWithType = {type_exp: expl}
+            explanations.update(explWithType)
+        """
+         for type_exp in two_recipes_experiment:
             expl = get_str_exp_two(user,
                                    recipeA_values,
                                    recipeB_values,
@@ -1960,12 +2322,12 @@ class Explain(Resource):
             if expl != "":
                 explWithType = {type_exp: expl}
                 explanations.update(explWithType)
+        """
 
         # list_exp.append(expl)
 
         # conversion Array to JSON
         json_exp = json.dumps({'explanations': explanations})
-
 
         return json_exp
 
@@ -1974,3 +2336,11 @@ api.add_resource(Explain, '/exp/')
 
 if __name__ == '__main__':
     app.run(port=5003)
+
+from flask import Flask
+from flask_restful import Resource, Api
+
+app = Flask(__name__)
+api = Api(app)
+
+app.debug = True
