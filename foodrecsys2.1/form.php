@@ -3,7 +3,8 @@
 @session_start();
 //type of explanation
 //decide to show expl [ 0 ==> no explanation - 1 ==> single recipe explanations - 2 == double expl]
-$showExpl = rand(0, 2);
+// $showExpl = rand(0, 2);
+$showExpl = 0;
 $_SESSION['showExpl'] = $showExpl;
 $_SESSION['mainTypeExpl'] = "";
 $_SESSION['secondTypeExpl'] = "";
@@ -358,6 +359,7 @@ $_SESSION['dessertTypeExplB'] = "";
                                     </div>
 
                                     <!-- Restriction -->
+                                    <!--
                                     <div class="form-group row">
                                         <label for="restriction" class="col-sm-6 col-form-label">Select your restriction</label>
                                         <div class="col-sm-5">
@@ -378,6 +380,41 @@ $_SESSION['dessertTypeExplB'] = "";
                                                 <label for="nickel">Low-Nickel</label>
                                             </div>
                                             <div class="form-check form-check-inline">
+                                                <input id="light" name="light" type="checkbox">
+                                                <label for="light">Light recipe</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    -->
+
+                                    <div class="form-group row">
+                                        <label for="restriction" class="col-sm-6 col-form-label">Select your restriction</label>
+                                        <div class="col-sm-5">
+                                            <div class="form-check">
+                                                <input id="diabetes" name="diabetes" type="checkbox">
+                                                <label for="diabetes">Diabetes</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="pregnant" name="pregnant" type="checkbox">
+                                                <label for="pregnant">Pregnant or breastfeeding</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="vegetarian" name="vegetarian" type="checkbox">
+                                                <label for="vegetarian">Vegetarian</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="lactose" name="lactose" type="checkbox">
+                                                <label for="lactose">Lactose-free</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="gluten" name="gluten" type="checkbox">
+                                                <label for="gluten">Gluten-free</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="nickel" name="nickel" type="checkbox">
+                                                <label for="nickel">Low-Nickel</label>
+                                            </div>
+                                            <div class="form-check">
                                                 <input id="light" name="light" type="checkbox">
                                                 <label for="light">Light recipe</label>
                                             </div>

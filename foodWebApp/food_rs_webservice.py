@@ -669,6 +669,8 @@ class Mood(Resource):
             score = row.ratingValue * np.log10(row.ratingCount)
             return score
 
+        # TODO start script
+
         df['score'] = df.apply(score, axis=1)
 
         # calcolo medie prima di 'tagliare' il DataFrame

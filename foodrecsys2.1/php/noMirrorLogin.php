@@ -122,6 +122,22 @@
             $vegetarian = false;
         }
 
+        if(isset($_POST['diabetes'])){
+            $diabetes = $_POST['diabetes'];
+            $answers = $answers . "-diabetes-";
+        }
+        else{
+            $diabetes = false;
+        }
+
+        if(isset($_POST['pregnant'])){
+            $pregnant = $_POST['pregnant'];
+            $answers = $answers . "-pregnant-";
+        }
+        else{
+            $pregnant = false;
+        }
+
         if(isset($_POST['lactose'])){
             $lactose = $_POST['lactose'];
             $answers = $answers . "-lactosefree-";
@@ -166,19 +182,19 @@
                  */
 
 
-
+        // TODO
 
         $url_old = createURL_old($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose,
-            $gluten, $nickel, $light, $user_difficulty);
+            $gluten, $nickel, $light, $diabetes, $pregnant, $user_difficulty);
         $url_new = createURL($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose,
-            $gluten, $nickel, $light, $user_difficulty, $user_time, $user_cost, $age, $goal);
+            $gluten, $nickel, $light, $diabetes, $pregnant, $user_difficulty, $user_time, $user_cost, $age, $goal);
 
 
 		
 		
 		//here is created the recommendation
         $data = getRecipes($url_new, $url_old);
-		//$data = getRecipes(createURL($mood, $stress, $depression, $underweight, $overweight, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $exp));
+		//$data = getRecipes(createURL($mood, $stress, $depression, $underweight, $overweight, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant, $exp));
 		
 		$explanations = [];
 		
@@ -188,7 +204,7 @@
 		$explanations["main_exp"] = getExplanation(createUrlExp(
                 $mood, $stress, $depression,
                 $fatclass, $health_style, $health_condition, $activity, $sleep,
-                $vegetarian, $lactose, $gluten, $nickel, $light,
+                $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
                 $user_time, $user_cost, $age, $goal,
                 $user_difficulty, $imgurlA, $imgurlB,
                 $userFavIngredients, $type_explanation)
@@ -220,7 +236,7 @@
 		$explanations["second_exp"] = getExplanation(createUrlExp(
                 $mood, $stress, $depression,
                 $fatclass, $health_style, $health_condition, $activity, $sleep,
-                $vegetarian, $lactose, $gluten, $nickel, $light,
+                $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
                 $user_time, $user_cost, $age, $goal,
                 $user_difficulty, $imgurlA, $imgurlB,
                 $userFavIngredients, $type_explanation)
@@ -252,7 +268,7 @@
 		$explanations["dessert_exp"] = getExplanation(createUrlExp(
                 $mood, $stress, $depression,
                 $fatclass, $health_style, $health_condition, $activity, $sleep,
-                $vegetarian, $lactose, $gluten, $nickel, $light,
+                $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
                 $user_time, $user_cost, $age, $goal,
                 $user_difficulty, $imgurlA, $imgurlB,
                 $userFavIngredients, $type_explanation)
