@@ -1,6 +1,7 @@
 <?php
 	
 	$dish = $_POST['dish'];
+
 	#type explanation to get the same type for every recipe (if u want to use the feature, manage in the explanation service)
 	$type_explanation = rand(0, 13);
 
@@ -24,6 +25,7 @@
         "userAge_two",
         "descriptions"
     );
+
     //type exps single A
     $typeExpsOneA = array (
         "popularity_oneA",
@@ -42,6 +44,7 @@
         "userAge_oneA",
         "descriptionA"
     );
+
     //type exps single B
     $typeExpsOneB = array (
         "popularity_oneB",
@@ -60,6 +63,7 @@
         "userAge_oneB",
         "descriptionB"
     );
+
     //for the experiment I use a random exp, one of these random, different for every dish
     $expMainIndex = rand(0, count($typeExpsTwo) - 1);
     $expSecondIndex = rand(0, count($typeExpsTwo) - 1);
@@ -81,7 +85,6 @@
         $height = $_POST['height'] / 100;
         $weight = $_POST['weight'];
 
-        // $fatclass = ($weight * 10000) / ($height * $height);
         $fatclass = ($weight * 1.3) / ($height ** 2.5);
 
         $health_style = $_POST['HS'];
@@ -173,19 +176,7 @@
             $light = false;
         }
 
-
         $answers = $answers . ',';
-
-        /*$underweight = false;
-                $overweight = false;
-                if($fatclass < 19)
-                    $underweight = true;
-                if($fatclass >= 25)
-                    $overweight = true;
-                 */
-
-
-        // TODO
 
         $url_old = createURL_old($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose,
             $gluten, $nickel, $light, $diabetes, $pregnant, $user_difficulty);
@@ -194,7 +185,6 @@
 		
 		//here is created the recommendation
         $data = getRecipes($url_new, $url_old);
-		//$data = getRecipes(createURL($mood, $stress, $depression, $underweight, $overweight, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant, $exp));
 		
 		$explanations = [];
 		

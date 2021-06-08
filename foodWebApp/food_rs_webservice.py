@@ -149,7 +149,6 @@ class Mood(Resource):
 
 
         # score by richness
-
         def dfFromIngredient(df, searchIngrendient):
             new_rows = []
             returnDf = pd.DataFrame()
@@ -669,7 +668,7 @@ class Mood(Resource):
             score = row.ratingValue * np.log10(row.ratingCount)
             return score
 
-        # TODO start script
+        # MARKER create dataframe
 
         df['score'] = df.apply(score, axis=1)
 
@@ -698,7 +697,7 @@ class Mood(Resource):
         # fiberAvg = df.fibers.mean()
         # fiberStd = df.fibers.std()
 
-        # accorgimenti parametri
+        # MARKER get request.args
         n = int(request.args.get('n')) if (request.args.get('n') is not None) else -1
 
         recipeName = request.args.get('recipeName')
@@ -712,7 +711,6 @@ class Mood(Resource):
                 request.args.get('isLactoseFree') is not None) else ''
         isGlutenFree = int(request.args.get('isGlutenFree')) if (request.args.get('isGlutenFree') is not None) else ''
         isLight = int(request.args.get('isLight')) if (request.args.get('isLight') is not None) else ''
-
         isDiabetes = int(request.args.get('isDiabetes')) if (request.args.get('isDiabetes') is not None) else ''
         isPregnant = int(request.args.get('isPregnant')) if (request.args.get('isPregnant') is not None) else ''
 
@@ -734,90 +732,65 @@ class Mood(Resource):
         sleep = request.args.get('sleep')
         depression = request.args.get('depression')
 
-        # overweight = request.args.get('overweight')
-        # underweight = request.args.get('underweight')
-
-        # height = request.args.get('height')
-        # weight = request.args.get('weight')
-        # bmi = weight / (height * height)
-
         bmi = float(request.args.get('fatclass')) if (request.args.get('fatclass') is not None) else ''
 
         healthy = request.args.get('healthy')
 
-        # filtro il DF sulle ricette salutari
-        # https://acmrecsys.github.io/rsss2019/Food-Recommender-ctrattner.pdf
+        # MARKER filtro DF ricette salutari - https://acmrecsys.github.io/rsss2019/Food-Recommender-ctrattner.pdf
         if healthy == 'high':
-            # print("healthy: ", healthy)
             df = df[(df.sugars <= 5) & (df.fat <= 3) & (df.saturatedFat <= 1.5)]
         elif healthy == 'medium':
-            # print("healthy: ", healthy)
             df = df[(df.sugars >= 5) & (df.sugars <= 15) &
                     (df.fat >= 3) & (df.fat <= 20) &
-                    (df.saturatedFat >= 1.5) & (df.saturatedFat <= 5)
-                    ]
+                    (df.saturatedFat >= 1.5) & (df.saturatedFat <= 5)]
         elif healthy == 'low':
-            # print("healthy: ", healthy)
             df = df[(df.sugars >= 15) & (df.fat >= 20) & (df.saturatedFat > 5) & (df.sodium >= 1.5)]
 
-        # filtro il DataFrame su nome della ricetta cercata
+        # MARKER filtro il DataFrame su nome della ricetta cercata
         if recipeName:
-            # print("recipeName: " + recipeName)
             df = df[df.title.str.contains(recipeName, case=False)]
 
-        # filtro il DataFrame su ingrediente della ricetta cercato
-
+        # MARKER filtro il DataFrame su ingrediente della ricetta cercato
         if ingredient:
-            # print("ingredient: " + ingredient)
             df = dfFromIngredient(df, ingredient)
 
+        # MARKER change score for category
         # categories = df.category.unique()
         # ['Dolci', 'Primi piatti', 'Lievitati', 'Salse e Sughi', 'Piatti Unici', 'Contorni', 'Antipasti',
         # 'Secondi piatti','Torte salate', 'Bevande', 'Insalate', 'Marmellate e Conserve']
 
         if category:
-            # print('category: ' + category)
             df = df[df.category == category]
 
-        # cost = df.cost.unique()
-        # ['Molto basso', 'Medio', 'Basso', 'None', 'Elevato', 'Molto elevata']
-
+        # MARKER change score for cost
         if cost:
-            # print("cost: " + cost)
             df = df[df.cost == cost]
 
+        # MARKER change score for restrictions
         if isLowNickel:
-            # print("isLowNickel: " + str(isLowNickel))
             df = df[df.isLowNickel == isLowNickel]
 
         if isVegetarian:
-            # print("isVegetarian: " + str(isVegetarian))
             df = df[df.isVegetarian == isVegetarian]
 
         if isLactoseFree:
-            # print("isLactoseFree: " + str(isLactoseFree))
             df = df[df.isLactoseFree == isLactoseFree]
 
         if isGlutenFree:
-            # print("isGlutenFree: " + str(isGlutenFree))
             df = df[df.isGlutenFree == isGlutenFree]
 
         if isLight:
-            # print("isLight: " + str(isLight))
             df = df[df.isLight == isLight]
 
-        # if overweight:
-        # print('overweight:', overweight)
-        # df.score = df.apply(rescoreOverweight, axis=1)
-        # df = df.sort_values('score', ascending=False)
-        # print(df[['title', 'score']].head(10))
+        # TODO isDiabetes
+        # if isDiabetes:
+        #     df = dfFromIngredient(df, ingredient)
 
-        # if underweight:
-        # print('underweight: ', underweight)
-        # df.score = df.apply(rescoreUnderweight, axis=1)
-        # df = df.sort_values('score', ascending=False)
-        # print(df[['title', 'score']].head(10))
+        # TODO isPregnant
+        # if isPregnant:
+        #     df = dfFromIngredient(df, ingredient)
 
+        # MARKER change score for bmi value
         bmiWeight = 'normal'
         if bmi < 19:
             bmiWeight = 'under'
@@ -833,105 +806,83 @@ class Mood(Resource):
             df.score = df.apply(rescoreObesityPlus, axis=1)
         df = df.sort_values('score', ascending=False)
 
+        # MARKER change score if mood == 'bad'
         if mood == 'bad':
-            # print('mood: bad')
-            # print("sugarAvg: " + str(sugarAvg))
-
-            # df = df[df.sugar > sugarAvg]
             df.score = df.apply(rescoreMoodBad, axis=1)
             df = df.sort_values('score', ascending=False)
-            # print(df[['title', 'score']].head(10))
 
+        # MARKER change score for activity
         if activity == 'medium':
             df.score = df.apply(rescoreActivityMedium, axis=1)
             df = df.sort_values('score', ascending=False)
         elif activity == 'high':
-            # print('activity: high')
-            # print("caloriesAvg: " + str(caloriesAvg))
-            # print("proteinsAvg: " + str(proteinsAvg))
-
-            # df = df[(df.calories > caloriesAvg) & (df.proteins > proteinsAvg)]
             df.score = df.apply(rescoreActivityHigh, axis=1)
             df = df.sort_values('score', ascending=False)
-            # print(df[['title', 'score']].head(10))
 
-        # stress => cibo salato (https://www.nutritestesso.it/it/lo-stretto-legame-cibo-ed-emozioni/)
+        # MARKER change score if stress == 'yes'
         if stress == 'yes':
-            # print('stress : ' + str(stress))
-            # print("sodiumAvg: " + str(sodiumAvg))
-
-            # df = df[df.sodium > sodiumAvg]
             df['antistress'] = df.ingredients.apply(isAntistress)
             df.score = df.apply(rescoreStress, axis=1)
             df.score = df.apply(rescoreCoffe, axis=1)
             df = df.sort_values('score', ascending=False)
-            # print(df[['title', 'score']].head(10))
 
+        # MARKER change score if sleep == 'low'
         # poco sonno => mangia magnesio
         if sleep == 'low':
-            # print("sleep: " + sleep)
-            # df = df[df.magnesium > 0]
             df['magnesium'] = df.ingredients.apply(isRichMagnesium)
             df.score = df.apply(rescoreMagnesium, axis=1)
             df.score = df.apply(rescoreCoffe, axis=1)
             df.score = df.apply(rescoreSleep, axis=1)
 
-        # sera => ricalcolo il caffe
+        # MARKER change score if hour == 'evening' - sera => ricalcolo il caffe
         if hour == 'evening':
-            # print ("hour: " + hour)
             df.score = df.apply(rescoreCoffe, axis=1)
 
+        # MARKER change score if depression == 'yes'
         # depressione => meno grassi
         if depression == 'yes':
-            # print ("depression: " + depression)
-            # print("fatAvg: " + str(fatAvg))
-
-            # df = df[df.fat < fatAvg]
             df['magnesium'] = df.ingredients.apply(isRichMagnesium)
             df.score = df.apply(rescoreDepression, axis=1)
             df.score = df.apply(rescoreCoffe, axis=1)
             df.score = df.apply(rescoreMagnesium, axis=1)
             df = df.sort_values('score', ascending=False)
-            # print(df[['title', 'score']].head(10))
 
+        # MARKER change score for user_difficulty
         if user_difficulty != '':
-            # print ('user_difficulty: ', user_difficulty)
             df.score = df.apply(rescoreDifficulty, difficulty=user_difficulty, axis=1)
             df = df.sort_values('score', ascending=False)
-            # print(df[['title', 'score']].head(10))
 
+        # MARKER change score for goal
         if goal != '':
-            # print ('goal: ', goal)
-
             # se vuole prendere peso e non è sovrappeso
             if bmiWeight != 'over' and goal == 1:
-                # if((not(overweight)) and goal == 1):
                 df.score = df.apply(rescoreGoalPlus, axis=1)
+
             # se vuole perdere peso e non è sottopeso
             if bmiWeight != 'under' and goal == -1:
                 df.score = df.apply(rescoreGoalMinus, axis=1)
 
             df = df.sort_values('score', ascending=False)
 
-        # value '5' stands for 'not important', so we don't sway the recommender
+        # MARKER change score for user_cost - value '5' stands for 'not important', so we don't sway the recommender
         if user_cost != '':
-            # print ('user_cost: ', user_cost)
             df.score = df.apply(rescoreCost, cost=user_cost, axis=1)
             df = df.sort_values('score', ascending=False)
 
-        # value '0' stands for 'no costraints', so we don't sway the recommender
+        # MARKER change score for user_time - value '0' stands for 'no costraints', so we don't sway the recommender
         if user_time != '':
-            # print ('user_time: ', user_time)
             if user_time == 0:
                 user_time = 200
             df.score = df.apply(rescoreTime, time=user_time, axis=1)
             df = df.sort_values('score', ascending=False)
+
+        # MARKER change score for sex
         if sex == "M":
             df.score = df.apply(rescore_sex_M, axis=1)
         else:
             df.score = df.apply(rescore_sex_F, axis=1)
 
-            # print ('age: ', age)
+        # MARKER change score for age
         if age == 'U20':
             df.score = df.apply(rescoreU20, axis=1)
         elif age == 'U30':
@@ -961,11 +912,13 @@ class Mood(Resource):
             df['vitaminD'] = df.ingredients.apply(isRichCalcium)
             df.score = df.apply(rescoreCalcium, axis=1)
 
+        # MARKER sort dataframe by score value
         df = df.sort_values('score', ascending=False)
 
         return df.head(n).sample(frac=1).to_json(orient='split')
 
 
+# MARKER create API
 api.add_resource(Mood, '/mood/')
 
 if __name__ == '__main__':

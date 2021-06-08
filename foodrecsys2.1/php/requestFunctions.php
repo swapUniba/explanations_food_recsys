@@ -175,8 +175,6 @@ function createUrlExp(
                 $url = $url . "goal=no&";
         }
 
-
-
         //RESTRICTION & INGREDIENTS
         $restrictions = [];
 
@@ -196,16 +194,11 @@ function createUrlExp(
         if($light)
             array_push($restrictions,"light");
 
-
         if(count($restrictions) > 0)
             $url = $url . "restr=" . urlencode(implode(",",$restrictions)) . "&";
 
-
         //INGREDIENTS
         $url = $url . "user_ingredients=" . $userFavIngredient . "&";
-
-
-
 
         //IMGURL
         $url = $url
