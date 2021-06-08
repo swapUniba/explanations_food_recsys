@@ -191,9 +191,6 @@
             $gluten, $nickel, $light, $diabetes, $pregnant, $user_difficulty);
         $url_new = createURL($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose,
             $gluten, $nickel, $light, $diabetes, $pregnant, $user_difficulty, $user_time, $user_cost, $age, $goal);
-
-
-		
 		
 		//here is created the recommendation
         $data = getRecipes($url_new, $url_old);

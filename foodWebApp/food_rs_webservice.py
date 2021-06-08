@@ -858,7 +858,7 @@ class Mood(Resource):
         # stress => cibo salato (https://www.nutritestesso.it/it/lo-stretto-legame-cibo-ed-emozioni/)
         if stress == 'yes':
             # print('stress : ' + str(stress))
-            print("sodiumAvg: " + str(sodiumAvg))
+            # print("sodiumAvg: " + str(sodiumAvg))
 
             # df = df[df.sodium > sodiumAvg]
             df['antistress'] = df.ingredients.apply(isAntistress)

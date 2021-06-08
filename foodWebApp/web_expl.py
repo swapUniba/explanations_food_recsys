@@ -425,10 +425,12 @@ class Explain(Resource):
                         smallList.append(item)
                     if recipeA[item] > recipeB[item]:
                         greatList.append(item)
-                print("small")
-                print(smallList)
-                print("great")
-                print(greatList)
+
+                # print("small")
+                # print(smallList)
+                # print("great")
+                # print(greatList)
+
             if smallList:
                 for item in smallList:
                     pivot = 0
@@ -643,10 +645,14 @@ class Explain(Resource):
                     explanation += sentence_builder_food_risks_benefits(item, risk, "sodium", "risk")
             for item in small:
                 risk = ""
-                print("start item small food risk 1")
-                print(item)
+
+                # print("start item small food risk 1")
+                # print(item)
+
                 risk = random.choice(nutrients[item]["risks"])
-                print(risk)
+
+                # print(risk)
+
                 if item == "saturatedFat":
                     explanation += sentence_builder_food_risks_benefits(item, risk, "saturated fat", "risk")
                 elif item == "carbohydrates":
@@ -686,9 +692,11 @@ class Explain(Resource):
 
             for item in great:
                 risk = ""
-                print("start item great risk 2 ")
-                print(item)
-                print(random.choice(nutrients[item]["risks"]))
+
+                # print("start item great risk 2 ")
+                # print(item)
+                # print(random.choice(nutrients[item]["risks"]))
+
                 risk = random.choice(nutrients[item]["risks"])
                 pivot = 0
                 if item == "saturatedFat":
@@ -755,8 +763,10 @@ class Explain(Resource):
             explanation, small, great = foodFeatures_one(recipe_values, nutrients)
             for item in great:
                 benefits = ""
-                print("start benefits 1 greats ")
-                print(item)
+
+                # print("start benefits 1 greats ")
+                # print(item)
+
                 benefits = random.choice(nutrients[item]["benefits"])
                 if item == "saturatedFat":
                     explanation += sentence_builder_food_risks_benefits(item, benefits, "saturated fat", "benefits")
@@ -774,8 +784,10 @@ class Explain(Resource):
                     explanation += sentence_builder_food_risks_benefits(item, benefits, "sodium", "benefits")
             for item in small:
                 benefits = ""
-                print("start benefits 1 smalls ")
-                print(item)
+
+                # print("start benefits 1 smalls ")
+                # print(item)
+
                 benefits = random.choice(nutrients[item]["benefits"])
                 if item == "saturatedFat":
                     explanation += sentence_builder_food_risks_benefits(item, benefits, "saturated fat", "benefits")
@@ -1528,12 +1540,15 @@ class Explain(Resource):
                                  "also important to take vitamin D."
 
             if user_age == 'U20':
-                print("enter u20 single")
+
+                # print("enter u20 single")
+
                 # in this age group we want recipes that contain ingredients rich in calcium and iron
                 calciumIngredientsInRecipe = isRichIn(richCalciumList, recipe_values)
                 ironIngredientsInRecipe = isRichIn(richIronList, recipe_values)
-                print(calciumIngredientsInRecipe)
-                print(ironIngredientsInRecipe)
+
+                # print(calciumIngredientsInRecipe)
+                # print(ironIngredientsInRecipe)
 
                 # define explanation
                 if (len(calciumIngredientsInRecipe) > 0) and (len(ironIngredientsInRecipe) > 0):
@@ -1571,7 +1586,9 @@ class Explain(Resource):
                         explanation += "which are ingredients rich in iron. "
                     explanation += under_20_motivation
             elif user_age == 'U30':
-                print("enter u30 single")
+
+                # print("enter u30 single")
+
                 # in this age group we want recipes that contain ingredients rich in calcium and iron
                 calciumIngredientsInRecipe = isRichIn(richCalciumList, recipe_values)
                 ironIngredientsInRecipe = isRichIn(richIronList, recipe_values)
@@ -1614,7 +1631,9 @@ class Explain(Resource):
 
                 # in this age group we want recipes that contain ingredients rich in magnesium
                 magnesiumIngredientsInRecipe = isRichIn(richMagnesiumList, recipe_values)
-                print(magnesiumIngredientsInRecipe)
+
+                # print(magnesiumIngredientsInRecipe)
+
                 if len(magnesiumIngredientsInRecipe) > 0:
                     explanation = recipe_values['title'] + " contains "
                     if len(magnesiumIngredientsInRecipe) == 1:
@@ -1625,7 +1644,9 @@ class Explain(Resource):
                         explanation += "which are ingredients rich in magnesium. "
                     explanation += under_40_motivation
             if user_age == 'U50':
-                print("enter u50 single")
+
+                # print("enter u50 single")
+
                 # in this age group we want recipes that contain ingredients rich in vitamin C and E, and antioxidants
                 antioxidantIngredientsInRecipe = isRichIn(richAntioxidantList, recipe_values)
                 vitaminCIngredientsInRecipe = isRichIn(richVitaminCList, recipe_values)
@@ -1648,7 +1669,9 @@ class Explain(Resource):
                         explanation += "(rich in vitamin E). "
                     explanation += under_50_motivation
             if (user_age == 'U60') or (user_age == '060'):
-                print("enter u60 single")
+
+                # print("enter u60 single")
+
                 # in this age group we want recipes that contain ingredients rich in calcium and vitamin D
                 vitaminDIngredientsInRecipe = isRichIn(richVitaminDList, recipe_values)
                 calciumIngredientsInRecipe = isRichIn(richCalciumList, recipe_values)
@@ -1691,8 +1714,10 @@ class Explain(Resource):
 
             explanation = explanation.replace('[', '')
             explanation = explanation.replace(']', '')
-            print("exit one")
-            print(explanation)
+
+            # print("exit one")
+            # print(explanation)
+
             return explanation
 
         """
@@ -1701,9 +1726,11 @@ class Explain(Resource):
         """
 
         def userAge_two(user_age, recipeA_values, recipeB_values):
-            print("user age two")
-            print(user_age)
-            print(type(user_age))
+
+            # print("user age two")
+            # print(user_age)
+            # print(type(user_age))
+
             explanation = ""
             # from https://www.myfooddata.com/articles/foods-high-in-calcium.php
             richCalciumList = ["tofu", "milk", "yogurt", "parmesan", "spinach",
@@ -1750,7 +1777,9 @@ class Explain(Resource):
             over_50_motivation = " In your age group, calcium intake is important to counteract bone loss. It is " \
                                  "also important to take vitamin D."
             if user_age == 'U20':
-                print("enter u20 double")
+
+                # print("enter u20 double")
+
                 # int this age we want food that contain calcium and iron
                 u30IngredientsFeatureList = richCalciumList + richIronList
                 u30IngredientsFeatureList = list(dict.fromkeys(u30IngredientsFeatureList))
@@ -1779,7 +1808,9 @@ class Explain(Resource):
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
                 explanation += under_30_motivation
             elif user_age == 'U30':
-                print("enter u30 double")
+
+                # print("enter u30 double")
+
                 # int this age we want food that contain calcium and iron
                 u30IngredientsFeatureList = richCalciumList + richIronList
                 u30IngredientsFeatureList = list(dict.fromkeys(u30IngredientsFeatureList))
@@ -1808,7 +1839,9 @@ class Explain(Resource):
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
                 explanation += under_30_motivation
             elif user_age == 'U40':
-                print("enter u40 double")
+
+                # print("enter u40 double")
+
                 # in this age we want ingredients wich are rich in magnesium
                 u40IngredientsFeatureList = richMagnesiumList
                 u40IngredientsFeatureList = list(dict.fromkeys(u40IngredientsFeatureList))
@@ -1816,9 +1849,11 @@ class Explain(Resource):
 
                 goodIngredientsInRecipeB = isRichIn(u40IngredientsFeatureList, recipeB_values)
                 # define explanation
-                print(u40IngredientsFeatureList)
-                print(goodIngredientsInRecipeA)
-                print(goodIngredientsInRecipeB)
+
+                # print(u40IngredientsFeatureList)
+                # print(goodIngredientsInRecipeA)
+                # print(goodIngredientsInRecipeB)
+
                 if (len(goodIngredientsInRecipeA) > 0) and (len(goodIngredientsInRecipeB) > 0):
                     # both recipes contain good ingredients for the user age
                     explanation = recipeA_values['title'] + " contains "
@@ -1837,7 +1872,9 @@ class Explain(Resource):
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
                 explanation += under_40_motivation
             elif user_age == 'U50':
-                print("enter u50 double")
+
+                # print("enter u50 double")
+
                 # we want ingredients rich in vitamin c and e and antioxidants
                 u50IngredientsFeatureList = richAntioxidantList + richVitaminCList + richVitaminEList
                 u50IngredientsFeatureList = list(dict.fromkeys(u50IngredientsFeatureList))
@@ -1868,7 +1905,9 @@ class Explain(Resource):
                     explanation += str(reduce(lambda x, y: x + "," + y, goodIngredientsInRecipeB)) + ". "
                     explanation += under_50_motivation
             elif (user_age == 'U60') or (user_age == '060'):
-                print("enter u60 double")
+
+                # print("enter u60 double")
+
                 # in this age group we want ingredients that are rich in calcium and vitamin d
                 o60IngredientsFeatureList = richCalciumList + richVitaminDList
                 o60IngredientsFeatureList = list(dict.fromkeys(o60IngredientsFeatureList))
@@ -1902,8 +1941,10 @@ class Explain(Resource):
 
             explanation = explanation.replace('[', '')
             explanation = explanation.replace(']', '')
-            print("exit two")
-            print(explanation)
+
+            # print("exit two")
+            # print(explanation)
+
             return explanation
 
         def isRichIn(ingredientsListRichsIn, recipe_values):
@@ -1920,8 +1961,10 @@ class Explain(Resource):
                         richInRecipe.append(ingredient)
             # remove duplicates
             richInRecipe = list(dict.fromkeys(richInRecipe))
-            print("rich")
-            print(richInRecipe)
+
+            # print("rich")
+            # print(richInRecipe)
+
             return richInRecipe
 
         # -----
@@ -2121,7 +2164,7 @@ class Explain(Resource):
                     expl = recipeA_values['description'] + recipeB_values['description']
             return expl
 
-        # ---
+        # TODO start script
 
         nutrientsPath = 'Nutrient.json'
         restrictionsPath = 'Restrictions.json'
@@ -2257,9 +2300,11 @@ class Explain(Resource):
         # web app request a specific type of explanation for every recipe(use if u want that same type of exp is shown)
         # type_explanation_requested = int(request.args.get('type'))
         explanations = {}
-        #type_exp = one_recipe_experiment[random.randint(0, 13)]
+        # type_exp = one_recipe_experiment[random.randint(0, 13)]
         type_exp = "userAge_one"
-        print(type_exp)
+
+        # print(type_exp)
+
         expl = ""
         """
            for type_exp in one_recipe_experiment:
@@ -2323,6 +2368,8 @@ class Explain(Resource):
         """
 
         # list_exp.append(expl)
+
+        # print(explanations)
 
         # conversion Array to JSON
         json_exp = json.dumps({'explanations': explanations})
