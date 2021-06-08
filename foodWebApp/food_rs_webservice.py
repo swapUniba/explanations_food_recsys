@@ -712,6 +712,10 @@ class Mood(Resource):
                 request.args.get('isLactoseFree') is not None) else ''
         isGlutenFree = int(request.args.get('isGlutenFree')) if (request.args.get('isGlutenFree') is not None) else ''
         isLight = int(request.args.get('isLight')) if (request.args.get('isLight') is not None) else ''
+
+        isDiabetes = int(request.args.get('isDiabetes')) if (request.args.get('isDiabetes') is not None) else ''
+        isPregnant = int(request.args.get('isPregnant')) if (request.args.get('isPregnant') is not None) else ''
+
         user_difficulty = int(request.args.get('difficulty')) if (request.args.get('difficulty') is not None) else ''
 
         goal = int(request.args.get('goal')) if (request.args.get('goal') is not None) else ''

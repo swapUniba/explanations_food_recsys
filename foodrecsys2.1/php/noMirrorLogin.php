@@ -78,9 +78,12 @@
 	if(($dish == "main") || ($dish == "main_exp") ){
         $sex = $_POST['sexOption'];
         $age = $_POST['age'];
-        $height = $_POST['height'];
+        $height = $_POST['height'] / 100;
         $weight = $_POST['weight'];
-        $fatclass = ($weight * 10000) / ($height * $height);
+
+        // $fatclass = ($weight * 10000) / ($height * $height);
+        $fatclass = ($weight * 1.3) / ($height ** 2.5);
+
         $health_style = $_POST['HS'];
         $health_condition = $_POST['HC'];
         $health_food_choise = $_POST['HFC'];
@@ -209,6 +212,7 @@
                 $user_difficulty, $imgurlA, $imgurlB,
                 $userFavIngredients, $type_explanation)
 		);
+
 		switch ($showExpl){
             case 0: //no expl
                 break;
