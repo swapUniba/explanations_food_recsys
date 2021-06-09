@@ -821,7 +821,7 @@ class Mood(Resource):
             df.score = df.apply(rescore_good_food, axis=1, food='nuts')
             df.score = df.apply(rescore_less_sugar, axis=1)
 
-        if isPregnant and sex == "F":
+        if isPregnant and sex != "M":
             df.score = df.apply(rescore_good_food, axis=1, food='cheese')
             df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
             df.score = df.apply(rescore_good_food, axis=1, food='beans')
