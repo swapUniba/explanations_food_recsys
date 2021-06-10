@@ -17,39 +17,69 @@ class Mood(Resource):
 
         lang = request.args.get('lang')
 
-        if lang == 'en':
-            df = pd.read_csv(url_dataset_en)
-
-        else:
+        if lang == 'it':
             df = pd.read_csv(url_dataset_it)
+        else:
+            df = pd.read_csv(url_dataset_en)
 
         # rich ingridients list
         richCalciumList = ["tofu", "latte", "yogurt", "parmigiano", "spinaci",
-                           "piselli dagli occhi neri", "gombo", "trota", "zucca", "vongole"]
+                           "piselli", "gombo", "trota", "zucca", "vongole"]
+
+        richCalciumList_en = ["tofu", "milk", "yogurt", "parmigiano", "spinach",
+                           "peas", "okra", "trout", "pumpkin", "clams"]
 
         richIronList = ["cereali", "manzo", "crostacei", "albicocche", "fagioli bianchi",
                         "spinaci", "cioccolato fondente", "quinoa", "funghi", "semi di zucca"]
 
+        richIronList_en = ["grains", "beef", "shellfish", "apricots", "white beans",
+                        "spinach," "dark chocolate," "quinoa," "mushrooms," "pumpkin seeds"]
+
         richLycopeneList = ["guaiave", "pomodoro", "anguria", "pompelmo", "papaia",
                             "peperoni rossi", "cachi", "asparagi", "cavoli rossi", "mango"]
 
+        richLycopeneList_en = ["guavas", "tomato", "watermelon", "grapefruit", "papaya",
+                            "red peppers," "persimmons," "asparagus," "red cabbage," "mango"]
+
         richBetaCaroteneList = ["patata dolce", "carote", "spinaci", "zucca", "melone",
                                 "lattuga romana", "peperoni rossi", "albicocche", "broccoli", "piselli"]
+
+        richBetaCaroteneList_en = ["sweet potato", "carrots", "spinach", "squash", "cantaloupe",
+                                "lettuce", "red peppers", "apricots", "broccoli", "peas"]
+
         richAntioxidantList = richLycopeneList + richBetaCaroteneList
+
+        richAntioxidantList_en = richLycopeneList_en + richBetaCaroteneList_en
 
         richVitaminCList = ["guaiave", "kiwi", "peperoni rossi", "fragole", "arance",
                             "papaya", "broccoli", "pomodoro", "piselli", "cavolo nero"]
 
+        richVitaminCList_en = ["guavas," "kiwis," "red peppers," "strawberries," "oranges."
+                            "papaya", "broccoli", "tomato", "peas", "kale"]
+
         richVitaminEList = ["semi di girasole", "mandorle", "avocado", "spinaci", "zucca",
                             "kiwi", "broccoli", "trota", "olio d'oliva", "gamberetti"]
 
+        richVitaminEList_en = ["sunflower seeds", "almonds", "avocado", "spinach", "pumpkin",
+                            "kiwi", "broccoli", "trout", "olive oil", "shrimp"]
+
         richVitaminDList = ["salmone", "castagna", "latte", "latte di soia", "tofu",
                             "yogurt", "cereali per la colazione", "succo d'arancia", "braciole di maiale", "uova"]
+
+        richVitaminDList_en = ["salmon", "chestnut", "milk", "soy milk", "tofu",
+                            "yogurt," "breakfast cereal," "orange juice," "pork chops," "eggs"]
+
         richMagnesium = ['crusca', 'mandorle', 'anacardi', 'cereali integrali', 'piselli', 'fagioli', 'datteri',
                          'aneto', 'fichi', 'nocciole']
 
+        richMagnesium_en = ['bran', 'almonds', 'cashews', 'whole grains', 'peas', 'beans', 'dates',
+                         'dill', 'figs', 'hazelnuts']
+
         cibiAntistress = ['latte intero', 'riso', 'pollo', 'cereali integrali', 'manzo', 'fagioli', 'noci',
                           'cioccolato', 'formaggio', 'broccoli']
+
+        cibiAntistress_en = ['whole milk', 'rice', 'chicken', 'whole grain', 'beef', 'beans', 'nuts',
+                          'chocolate', 'cheese', 'broccoli']
 
         # parametrization
 
@@ -73,75 +103,132 @@ class Mood(Resource):
         # the one who is most subject to changes/improvements, i've created a function for each nutrient in order to not
         # unnecessarily complicate future work
         def isRichMagnesium(ingredients):
-            listIngredients = ingredients.strip("[ ]").split(", ")
+            listIngredients = ingredients.strip("[ ]").split(",")
 
             magnesium = 0
-            for elem in richMagnesium:
-                if any(elem in ingredient.lower() for ingredient in listIngredients):
-                    magnesium += 1
-            mg = magnesium / len(richMagnesium)
+            if lang == 'it':
+                for elem in richMagnesium:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        magnesium += 1
+                mg = magnesium / len(richMagnesium)
+            else:
+                for elem in richMagnesium_en:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        magnesium += 1
+                mg = magnesium / len(richMagnesium_en)
             return (mg)
 
         def isRichIron(ingredients):
-            listIngredients = ingredients.strip("[ ]").split(", ")
+            listIngredients = ingredients.strip("[ ]").split(",")
 
             Iron = 0
-            for elem in richIronList:
-                if any(elem in ingredient.lower() for ingredient in listIngredients):
-                    Iron += 1
-            fe = Iron / len(richIronList)
+            if lang == 'it':
+                for elem in richIronList:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        Iron += 1
+                fe = Iron / len(richIronList)
+            else:
+                for elem in richIronList_en:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        Iron += 1
+                fe = Iron / len(richIronList_en)
             return (fe)
 
         def isRichAntioxidant(ingredients):
-            listIngredients = ingredients.strip("[ ]").split(", ")
+            listIngredients = ingredients.strip("[ ]").split(",")
 
             AntiOxidant = 0
-            for elem in richAntioxidantList:
-                if any(elem in ingredient.lower() for ingredient in listIngredients):
-                    AntiOxidant += 1
-            Ao = AntiOxidant / len(richAntioxidantList)
+            if lang == 'it':
+                for elem in richAntioxidantList:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        AntiOxidant += 1
+                Ao = AntiOxidant / len(richAntioxidantList)
+            else:
+                for elem in richAntioxidantList_en:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        AntiOxidant += 1
+                Ao = AntiOxidant / len(richAntioxidantList_en)
             return (Ao)
 
         def isRichVitaminC(ingredients):
-            listIngredients = ingredients.strip("[ ]").split(", ")
+            listIngredients = ingredients.strip("[ ]").split(",")
 
             VitaminC = 0
-            for elem in richVitaminCList:
-                if any(elem in ingredient.lower() for ingredient in listIngredients):
-                    VitaminC += 1
-            Vc = VitaminC / len(richVitaminCList)
+            if lang == 'it':
+                for elem in richVitaminCList:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        VitaminC += 1
+                Vc = VitaminC / len(richVitaminCList)
+            else:
+                for elem in richVitaminCList_en:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        VitaminC += 1
+                Vc = VitaminC / len(richVitaminCList_en)
             return (Vc)
 
         def isRichVitaminD(ingredients):
-            listIngredients = ingredients.strip("[ ]").split(", ")
+            listIngredients = ingredients.strip("[ ]").split(",")
 
             VitaminD = 0
-            for elem in richVitaminDList:
-                if any(elem in ingredient.lower() for ingredient in listIngredients):
-                    VitaminD += 1
-            Vd = VitaminD / len(richVitaminDList)
+            if lang == 'it':
+                for elem in richVitaminDList:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        VitaminD += 1
+                Vd = VitaminD / len(richVitaminDList)
+            else:
+                for elem in richVitaminDList_en:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        VitaminD += 1
+                Vd = VitaminD / len(richVitaminDList_en)
             return (Vd)
 
         def isRichVitaminE(ingredients):
-            listIngredients = ingredients.strip("[ ]").split(", ")
+            listIngredients = ingredients.strip("[ ]").split(",")
 
             VitaminE = 0
-            for elem in richVitaminEList:
-                if any(elem in ingredient.lower() for ingredient in listIngredients):
-                    VitaminE += 1
-            Ve = VitaminE / len(richVitaminEList)
+            if lang == 'it':
+                for elem in richVitaminEList:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        VitaminE += 1
+                Ve = VitaminE / len(richVitaminEList)
+            else:
+                for elem in richVitaminEList_en:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        VitaminE += 1
+                Ve = VitaminE / len(richVitaminEList_en)
             return (Ve)
 
         def isRichCalcium(ingredients):
-            listIngredients = ingredients.strip("[ ]").split(", ")
+            listIngredients = ingredients.strip("[ ]").split(",")
 
             Calcium = 0
-            for elem in richCalciumList:
-                if any(elem in ingredient.lower() for ingredient in listIngredients):
-                    Calcium += 1
-            Ca = Calcium / len(richCalciumList)
+            if lang == 'it':
+                for elem in richCalciumList:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        Calcium += 1
+                Ca = Calcium / len(richCalciumList)
+            else:
+                for elem in richCalciumList_en:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        Calcium += 1
+                Ca = Calcium / len(richCalciumList_en)
             return (Ca)
 
+        def isAntistress(ingredients):
+            listIngredients = ingredients.strip("[ ]").split(",")
+
+            antistress = 0
+            if lang == 'it':
+                for elem in cibiAntistress:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        antistress += 1
+                antiS = antistress / len(cibiAntistress)
+            else:
+                for elem in cibiAntistress_en:
+                    if any(elem in ingredient.lower() for ingredient in listIngredients):
+                        antistress += 1
+                antiS = antistress / len(cibiAntistress_en)
+            return (antiS)
 
         # score by richness
         def dfFromIngredient(df, searchIngrendient):
@@ -149,7 +236,7 @@ class Mood(Resource):
             returnDf = pd.DataFrame()
 
             for index, row in df.iterrows():
-                listIngredients = row.ingredients.strip("[ ]").split(", ")
+                listIngredients = row.ingredients.strip("[ ]").split(",")
 
                 if any(not (ingredient.lower().find(searchIngrendient)) for ingredient in listIngredients):
                     new_rows.append(row)
@@ -271,16 +358,6 @@ class Mood(Resource):
                                           score_high=2)
             return new_score
 
-        def isAntistress(ingredients):
-            listIngredients = ingredients.strip("[ ]").split(", ")
-
-            antistress = 0
-            for elem in cibiAntistress:
-                if any(elem in ingredient.lower() for ingredient in listIngredients):
-                    antistress += 1
-            antiS = antistress / len(cibiAntistress)
-            return (antiS)
-
         def rescoreStress(row):
             new_score = row.score
 
@@ -336,7 +413,10 @@ class Mood(Resource):
             return new_score
 
         def rescoreCoffe(row):
-            return rescore_bad_food(row, 'coffee')
+            if lang == 'it':
+                return rescore_bad_food(row, 'caffè')
+            else:
+                return rescore_bad_food(row, 'coffee')
 
         def rescore_good_food(row, food):
             listIngredients = row.ingredients.strip("[ ]").split(",")
@@ -809,29 +889,53 @@ class Mood(Resource):
             df = df[df.isLight == isLight]
 
         if isDiabetes:
-            df.score = df.apply(rescore_good_food, axis=1, food='salmon')
-            df.score = df.apply(rescore_good_food, axis=1, food='tuna')
-            df.score = df.apply(rescore_good_food, axis=1, food='trout')
-            df.score = df.apply(rescore_good_food, axis=1, food='mackerel')
-            df.score = df.apply(rescore_good_food, axis=1, food='egg')
-            df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
-            df.score = df.apply(rescore_good_food, axis=1, food='beans')
-            df.score = df.apply(rescore_good_food, axis=1, food='walnuts')
-            df.score = df.apply(rescore_good_food, axis=1, food='almond')
-            df.score = df.apply(rescore_good_food, axis=1, food='nuts')
+            if lang == 'it':
+                df.score = df.apply(rescore_good_food, axis=1, food='salmone')
+                df.score = df.apply(rescore_good_food, axis=1, food='tonno')
+                df.score = df.apply(rescore_good_food, axis=1, food='trota')
+                df.score = df.apply(rescore_good_food, axis=1, food='sgombro')
+                df.score = df.apply(rescore_good_food, axis=1, food='uova')
+                df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
+                df.score = df.apply(rescore_good_food, axis=1, food='fagioli')
+                df.score = df.apply(rescore_good_food, axis=1, food='noci')
+                df.score = df.apply(rescore_good_food, axis=1, food='mandorle')
+                df.score = df.apply(rescore_good_food, axis=1, food='nocciole')
+            else:
+                df.score = df.apply(rescore_good_food, axis=1, food='salmon')
+                df.score = df.apply(rescore_good_food, axis=1, food='tuna')
+                df.score = df.apply(rescore_good_food, axis=1, food='trout')
+                df.score = df.apply(rescore_good_food, axis=1, food='mackerel')
+                df.score = df.apply(rescore_good_food, axis=1, food='eggs')
+                df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
+                df.score = df.apply(rescore_good_food, axis=1, food='beans')
+                df.score = df.apply(rescore_good_food, axis=1, food='walnuts')
+                df.score = df.apply(rescore_good_food, axis=1, food='almond')
+                df.score = df.apply(rescore_good_food, axis=1, food='nuts')
             df.score = df.apply(rescore_less_sugar, axis=1)
 
         if isPregnant and sex != "M":
-            df.score = df.apply(rescore_good_food, axis=1, food='cheese')
-            df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
-            df.score = df.apply(rescore_good_food, axis=1, food='beans')
-            df.score = df.apply(rescore_good_food, axis=1, food='lentils')
-            df.score = df.apply(rescore_good_food, axis=1, food='salmon')
-            df.score = df.apply(rescore_good_food, axis=1, food='tuna')
-            df.score = df.apply(rescore_good_food, axis=1, food='trout')
-            df.score = df.apply(rescore_good_food, axis=1, food='mackerel')
-            df.score = df.apply(rescore_good_food, axis=1, food='egg')
-            df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
+            if lang == 'it':
+                df.score = df.apply(rescore_good_food, axis=1, food='formaggio')
+                df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
+                df.score = df.apply(rescore_good_food, axis=1, food='fagioli')
+                df.score = df.apply(rescore_good_food, axis=1, food='lenticchie')
+                df.score = df.apply(rescore_good_food, axis=1, food='salmone')
+                df.score = df.apply(rescore_good_food, axis=1, food='tonno')
+                df.score = df.apply(rescore_good_food, axis=1, food='trota')
+                df.score = df.apply(rescore_good_food, axis=1, food='sgombro')
+                df.score = df.apply(rescore_good_food, axis=1, food='uova')
+                df.score = df.apply(rescore_bad_food, axis=1, food='caffè')
+            else:
+                df.score = df.apply(rescore_good_food, axis=1, food='cheese')
+                df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
+                df.score = df.apply(rescore_good_food, axis=1, food='beans')
+                df.score = df.apply(rescore_good_food, axis=1, food='lentils')
+                df.score = df.apply(rescore_good_food, axis=1, food='salmon')
+                df.score = df.apply(rescore_good_food, axis=1, food='tuna')
+                df.score = df.apply(rescore_good_food, axis=1, food='trout')
+                df.score = df.apply(rescore_good_food, axis=1, food='mackerel')
+                df.score = df.apply(rescore_good_food, axis=1, food='eggs')
+                df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
 
         # MARKER change score for bmi value
         bmiWeight = 'normal'
@@ -852,18 +956,32 @@ class Mood(Resource):
         # MARKER change score if mood == 'bad'
         if mood == 'bad':
             df.score = df.apply(rescoreMoodBad, axis=1)
-            df.score = df.apply(rescore_good_food, axis=1, food='salmon')
-            df.score = df.apply(rescore_good_food, axis=1, food='tuna')
-            df.score = df.apply(rescore_good_food, axis=1, food='trout')
-            df.score = df.apply(rescore_good_food, axis=1, food='mackerel')
-            df.score = df.apply(rescore_good_food, axis=1, food='chocolate')
-            df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
-            df.score = df.apply(rescore_good_food, axis=1, food='banana')
-            df.score = df.apply(rescore_good_food, axis=1, food='oat')
-            df.score = df.apply(rescore_good_food, axis=1, food='coffee')
-            df.score = df.apply(rescore_good_food, axis=1, food='nuts')
-            df.score = df.apply(rescore_good_food, axis=1, food='beans')
-            df.score = df.apply(rescore_good_food, axis=1, food='lentils')
+            if lang == 'it':
+                df.score = df.apply(rescore_good_food, axis=1, food='salmone')
+                df.score = df.apply(rescore_good_food, axis=1, food='tonno')
+                df.score = df.apply(rescore_good_food, axis=1, food='trota')
+                df.score = df.apply(rescore_good_food, axis=1, food='sgombro')
+                df.score = df.apply(rescore_good_food, axis=1, food='cioccolato')
+                df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
+                df.score = df.apply(rescore_good_food, axis=1, food='banana')
+                df.score = df.apply(rescore_good_food, axis=1, food='avena')
+                df.score = df.apply(rescore_good_food, axis=1, food='caffè')
+                df.score = df.apply(rescore_good_food, axis=1, food='nocciole')
+                df.score = df.apply(rescore_good_food, axis=1, food='fagioli')
+                df.score = df.apply(rescore_good_food, axis=1, food='lenticchie')
+            else:
+                df.score = df.apply(rescore_good_food, axis=1, food='salmon')
+                df.score = df.apply(rescore_good_food, axis=1, food='tuna')
+                df.score = df.apply(rescore_good_food, axis=1, food='trout')
+                df.score = df.apply(rescore_good_food, axis=1, food='mackerel')
+                df.score = df.apply(rescore_good_food, axis=1, food='chocolate')
+                df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
+                df.score = df.apply(rescore_good_food, axis=1, food='banana')
+                df.score = df.apply(rescore_good_food, axis=1, food='oat')
+                df.score = df.apply(rescore_good_food, axis=1, food='coffee')
+                df.score = df.apply(rescore_good_food, axis=1, food='nuts')
+                df.score = df.apply(rescore_good_food, axis=1, food='beans')
+                df.score = df.apply(rescore_good_food, axis=1, food='lentils')
             df = df.sort_values('score', ascending=False)
 
         # MARKER change score for activity
@@ -888,20 +1006,36 @@ class Mood(Resource):
             df.score = df.apply(rescoreMagnesium, axis=1)
             df.score = df.apply(rescoreCoffe, axis=1)
             df.score = df.apply(rescoreSleep, axis=1)
-            df.score = df.apply(rescore_good_food, axis=1, food='almond')
-            df.score = df.apply(rescore_good_food, axis=1, food='turkey')
-            df.score = df.apply(rescore_good_food, axis=1, food='chamomile')
-            df.score = df.apply(rescore_good_food, axis=1, food='kiwi')
-            df.score = df.apply(rescore_good_food, axis=1, food='cherry')
-            df.score = df.apply(rescore_good_food, axis=1, food='salmon')
-            df.score = df.apply(rescore_good_food, axis=1, food='tuna')
-            df.score = df.apply(rescore_good_food, axis=1, food='trout')
-            df.score = df.apply(rescore_good_food, axis=1, food='mackerel')
-            df.score = df.apply(rescore_good_food, axis=1, food='walnuts')
-            df.score = df.apply(rescore_good_food, axis=1, food='rice')
-            df.score = df.apply(rescore_good_food, axis=1, food='cheese')
-            df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
-            df.score = df.apply(rescore_good_food, axis=1, food='oat')
+            if lang == 'it':
+                df.score = df.apply(rescore_good_food, axis=1, food='mandorle')
+                df.score = df.apply(rescore_good_food, axis=1, food='tacchino')
+                df.score = df.apply(rescore_good_food, axis=1, food='cammomilla')
+                df.score = df.apply(rescore_good_food, axis=1, food='kiwi')
+                df.score = df.apply(rescore_good_food, axis=1, food='ciliegie')
+                df.score = df.apply(rescore_good_food, axis=1, food='salmone')
+                df.score = df.apply(rescore_good_food, axis=1, food='tonno')
+                df.score = df.apply(rescore_good_food, axis=1, food='trota')
+                df.score = df.apply(rescore_good_food, axis=1, food='sgombro')
+                df.score = df.apply(rescore_good_food, axis=1, food='noci')
+                df.score = df.apply(rescore_good_food, axis=1, food='riso')
+                df.score = df.apply(rescore_good_food, axis=1, food='formaggio')
+                df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
+                df.score = df.apply(rescore_good_food, axis=1, food='avena')
+            else:
+                df.score = df.apply(rescore_good_food, axis=1, food='almond')
+                df.score = df.apply(rescore_good_food, axis=1, food='turkey')
+                df.score = df.apply(rescore_good_food, axis=1, food='chamomile')
+                df.score = df.apply(rescore_good_food, axis=1, food='kiwi')
+                df.score = df.apply(rescore_good_food, axis=1, food='cherry')
+                df.score = df.apply(rescore_good_food, axis=1, food='salmon')
+                df.score = df.apply(rescore_good_food, axis=1, food='tuna')
+                df.score = df.apply(rescore_good_food, axis=1, food='trout')
+                df.score = df.apply(rescore_good_food, axis=1, food='mackerel')
+                df.score = df.apply(rescore_good_food, axis=1, food='walnuts')
+                df.score = df.apply(rescore_good_food, axis=1, food='rice')
+                df.score = df.apply(rescore_good_food, axis=1, food='cheese')
+                df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
+                df.score = df.apply(rescore_good_food, axis=1, food='oat')
 
         # MARKER change score if hour == 'evening' - sera => ricalcolo il caffe
         if hour == 'evening':
