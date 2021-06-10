@@ -248,15 +248,15 @@ if(isset($_POST['prevDish'])) {
                                                                 $explanationshow = "";
                                                                 if ($dish == "main_exp")
                                                                 {
-                                                                    $explanationshow = $explanations[$dish][$mainTypeExplA] . ' ' . $explanations[$dish][$mainTypeExplB];
+                                                                    $explanationshow = $explanations[$dish][$mainTypeExplA] . '<br>' . $explanations[$dish][$mainTypeExplB];
                                                                 }
                                                                 if ($dish == "second_exp")
                                                                 {
-                                                                    $explanationshow = $explanations[$dish][$secondTypeExplA] . ' ' . $explanations[$dish][$secondTypeExplB];
+                                                                    $explanationshow = $explanations[$dish][$secondTypeExplA] . '<br>' . $explanations[$dish][$secondTypeExplB];
                                                                 }
                                                                 if ($dish == "dessert_exp")
                                                                 {
-                                                                    $explanationshow = $explanations[$dish][$dessertTypeExplA] . ' ' . $explanations[$dish][$dessertTypeExplB];
+                                                                    $explanationshow = $explanations[$dish][$dessertTypeExplA] . '<br>' . $explanations[$dish][$dessertTypeExplB];
                                                                 }
                                                                 echo $explanationshow;
                                                                 break;
@@ -274,6 +274,7 @@ if(isset($_POST['prevDish'])) {
                                                                 {
                                                                     $explanationshow = $explanations[$dish][$dessertTypeExpl];
                                                                 }
+
                                                                 echo $explanationshow;
                                                         }
                                                         ?>

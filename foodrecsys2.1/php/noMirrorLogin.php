@@ -2,9 +2,6 @@
 	
 	$dish = $_POST['dish'];
 
-	#type explanation to get the same type for every recipe (if u want to use the feature, manage in the explanation service)
-	$type_explanation = rand(0, 13);
-
 	$showExpl = $_SESSION['showExpl'];
 
     //typeExps AB
@@ -64,10 +61,14 @@
         "descriptionB"
     );
 
-    //for the experiment I use a random exp, one of these random, different for every dish
+	// explanation index to get the same type of explanation for every dish
+	// $type_explanation = rand(0, count($typeExpsTwo) - 1);
+
+    // explanation indexes to get the different explanations for every dishes
     $expMainIndex = rand(0, count($typeExpsTwo) - 1);
     $expSecondIndex = rand(0, count($typeExpsTwo) - 1);
     $expDessertIndex = rand(0, count($typeExpsTwo) - 1);
+
     $mainTypeExpl = "";
     $mainTypeExplA = "";
     $mainTypeExplB= "";
@@ -199,25 +200,26 @@
                 $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
                 $user_time, $user_cost, $age, $goal,
                 $user_difficulty, $imgurlA, $imgurlB,
-                $userFavIngredients, $type_explanation)
+                $userFavIngredients, $expMainIndex)
 		);
 
 		switch ($showExpl){
             case 0: //no expl
                 break;
             case 1: //single recipe explanations in one
-                while (! (array_key_exists($typeExpsOneB[$expMainIndex], $explanations["main_exp"])) and
-                    array_key_exists($typeExpsOneA[$expMainIndex],$explanations["main_exp"]) )
-                {
-                    $expMainIndex = rand(0, count($typeExpsOneB) - 1);
+                if (! array_key_exists($typeExpsOneA[$expMainIndex], $explanations["main_exp"])){
+                    $explanations["main_exp"] += array($typeExpsOneA[$expMainIndex] => "");
                 }
-                $mainTypeExplB = $typeExpsOneB[$expMainIndex];
+                if (! array_key_exists($typeExpsOneB[$expMainIndex], $explanations["main_exp"])){
+                    $explanations["main_exp"] += array($typeExpsOneB[$expMainIndex] => "");
+                }
+
                 $mainTypeExplA = $typeExpsOneA[$expMainIndex];
+                $mainTypeExplB = $typeExpsOneB[$expMainIndex];
                 break;
             case 2: //double recipe explanations
-                while (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["main_exp"]))
-                {
-                    $expMainIndex = rand(0, count($typeExpsTwo) - 1);
+                if (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["main_exp"])){
+                    $explanations["main_exp"] = array($typeExpsTwo[$expMainIndex] => "");
                 }
                 $mainTypeExpl = $typeExpsTwo[$expMainIndex];
                 break;
@@ -232,24 +234,24 @@
                 $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
                 $user_time, $user_cost, $age, $goal,
                 $user_difficulty, $imgurlA, $imgurlB,
-                $userFavIngredients, $type_explanation)
+                $userFavIngredients, $expSecondIndex)
 		);
         switch ($showExpl){
             case 0: //no explanation
                 break;
             case 1:
-                while (! (array_key_exists($typeExpsOneA[$expSecondIndex],$explanations["second_exp"])) and
-                    (array_key_exists($typeExpsOneB[$expSecondIndex], $explanations["second_exp"])))
-                {
-                    $expSecondIndex = rand(0, count($typeExpsOneB) - 1);
+                if (! array_key_exists($typeExpsOneA[$expMainIndex], $explanations["second_exp"])){
+                    $explanations["second_exp"] += array($typeExpsOneA[$expMainIndex] => "");
+                }
+                if (! array_key_exists($typeExpsOneB[$expMainIndex], $explanations["second_exp"])){
+                    $explanations["second_exp"] += array($typeExpsOneB[$expMainIndex] => "");
                 }
                 $secondTypeExplB = $typeExpsOneB[$expSecondIndex];
                 $secondTypeExplA = $typeExpsOneA[$expSecondIndex];
                 break;
             case 2:
-                while (! array_key_exists($typeExpsTwo[$expSecondIndex], $explanations["second_exp"]))
-                {
-                    $expSecondIndex = rand(0, count($typeExpsTwo) - 1);
+                if (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["second_exp"])){
+                    $explanations["second_exp"] = array($typeExpsTwo[$expMainIndex] => "");
                 }
                 $secondTypeExpl = $typeExpsTwo[$expSecondIndex];
                 break;
@@ -264,24 +266,24 @@
                 $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
                 $user_time, $user_cost, $age, $goal,
                 $user_difficulty, $imgurlA, $imgurlB,
-                $userFavIngredients, $type_explanation)
+                $userFavIngredients, $expDessertIndex)
 		);
         switch ($showExpl){
             case 0: //single expl for recipe A
                 break;
             case 1:
-                while (! (array_key_exists($typeExpsOneB[$expDessertIndex], $explanations["dessert_exp"])) and
-                    (array_key_exists($typeExpsOneA[$expDessertIndex],$explanations["dessert_exp"])))
-                {
-                    $expDessertIndex = rand(0, count($typeExpsOneB) - 1);
+                if (! array_key_exists($typeExpsOneA[$expMainIndex], $explanations["dessert_exp"])){
+                    $explanations["dessert_exp"] += array($typeExpsOneA[$expMainIndex] => "");
+                }
+                if (! array_key_exists($typeExpsOneB[$expMainIndex], $explanations["dessert_exp"])){
+                    $explanations["dessert_exp"] += array($typeExpsOneB[$expMainIndex] => "");
                 }
                 $dessertTypeExplB = $typeExpsOneB[$expDessertIndex];
                 $dessertTypeExplA = $typeExpsOneA[$expDessertIndex];
                 break;
             case 2:
-                while (! array_key_exists($typeExpsTwo[$expDessertIndex], $explanations["dessert_exp"]))
-                {
-                    $expDessertIndex = rand(0, count($typeExpsTwo) - 1);
+                if (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["dessert_exp"])){
+                    $explanations["dessert_exp"] = array($typeExpsTwo[$expMainIndex] => "");
                 }
                 $dessertTypeExpl = $typeExpsTwo[$expDessertIndex];
                 break;

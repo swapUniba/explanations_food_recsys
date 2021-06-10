@@ -1967,10 +1967,11 @@ class Explain(Resource):
 
             return richInRecipe
 
-        # -----
-        # Function get_string_exp returns the explanation of a specific type
-        # (popularity, food features, user features, ecc...)
-        # ---
+        """
+        Function get_string_exp returns the explanation of a specific type
+        (popularity, food features, user features, ecc...)
+        """
+
         def get_str_exp_one(user,
                             recipe_values,
                             type_explanation,
@@ -2164,7 +2165,7 @@ class Explain(Resource):
                     expl = recipeA_values['description'] + recipeB_values['description']
             return expl
 
-        # TODO start script
+        # MARKER start
 
         nutrientsPath = 'Nutrient.json'
         restrictionsPath = 'Restrictions.json'
@@ -2223,44 +2224,6 @@ class Explain(Resource):
             'Sex': request.args.get('sex')
         }
 
-        two_recipes = [
-            "popularity_two",
-            "foodGoals_two",
-            "foodPreferences_two",  # user restrictions
-            "foodFeatures_two",
-            "userSkills_two",
-            "foodFeatureHealthRisk_two",
-            "foodFeatureHealthBenefits_two",
-            "userFeatureHealthRisk_two",
-            "userFeatureHealthBenefits_two",
-            # new explanations
-            "userTime_two",
-            "userCosts_two",
-            "userLifestyle_two",
-            "userIngredients_two",
-            "userAge_two",
-            "descriptions"
-        ]
-
-        one_recipe = [
-            "popularity_one",
-            "foodGoals_one",
-            "foodPreferences_one",
-            "foodFeatures_one",
-            "userSkills_one",
-            "foodFeatureHealthRisk_one",
-            "foodFeatureHealthBenefits_one",
-            "userFeatureHealthRisk_one",
-            "userFeatureHealthBenefits_one",
-            # new explanations
-            "userTime_one",
-            "userCosts_one",
-            "userLifestyle_one",
-            "userIngredients_one",
-            "userAge_one",
-            "description"
-        ]
-
         # exps for the configuration
         two_recipes_experiment = [
             "popularity_two",
@@ -2279,6 +2242,7 @@ class Explain(Resource):
             "userAge_two",
             "descriptions"
         ]
+
         one_recipe_experiment = [
             "popularity_one",
             "foodGoals_one",
@@ -2297,28 +2261,15 @@ class Explain(Resource):
             "description"
         ]
 
-        # web app request a specific type of explanation for every recipe(use if u want that same type of exp is shown)
-        # type_explanation_requested = int(request.args.get('type'))
         explanations = {}
-        # type_exp = one_recipe_experiment[random.randint(0, 13)]
-        type_exp = "userAge_one"
+
+        # web app request a specific type of explanation for every recipe(use if u want that same type of exp is shown)
+        req_explanation_index = int(request.args.get('type'))
+        type_exp = one_recipe_experiment[req_explanation_index]
 
         # print(type_exp)
 
-        expl = ""
-        """
-           for type_exp in one_recipe_experiment:
-            expl = get_str_exp_one(user,
-                                   recipeA_values,
-                                   type_exp,
-                                   listRestrictions,
-                                   nutrients)
-            if expl != "":
-                type_for_recipe_a = type_exp + "A"
-                explWithTypeA = {type_for_recipe_a: expl}
-                explanations.update(explWithTypeA)
-        """
-
+        # expls a
         expl = get_str_exp_one(user, recipeA_values, type_exp, listRestrictions, nutrients)
         if expl != "":
             type_for_recipe_a = type_exp + "A"
@@ -2331,20 +2282,9 @@ class Explain(Resource):
             type_for_recipe_b = type_exp + "B"
             explWithTypeB = {type_for_recipe_b: expl}
             explanations.update(explWithTypeB)
-        """for type_exp in one_recipe_experiment:
-            expl = get_str_exp_one(user,
-                                   recipeB_values,
-                                   type_exp,
-                                   listRestrictions,
-                                   nutrients)
-            if expl != "":
-                type_for_recipe_B = type_exp + "B"
-                explWithTypeA = {type_for_recipe_B: expl}
-                explanations.update(explWithTypeA)
-"""
 
-        expl = ""
-        type_exp = two_recipes_experiment[random.randint(0, 13)]
+
+        type_exp = two_recipes_experiment[req_explanation_index]
         expl = get_str_exp_two(user,
                                recipeA_values,
                                recipeB_values,
@@ -2354,20 +2294,6 @@ class Explain(Resource):
         if expl != "":
             explWithType = {type_exp: expl}
             explanations.update(explWithType)
-        """
-         for type_exp in two_recipes_experiment:
-            expl = get_str_exp_two(user,
-                                   recipeA_values,
-                                   recipeB_values,
-                                   type_exp,
-                                   listRestrictions,
-                                   nutrients)
-            if expl != "":
-                explWithType = {type_exp: expl}
-                explanations.update(explWithType)
-        """
-
-        # list_exp.append(expl)
 
         # print(explanations)
 
