@@ -361,19 +361,16 @@ class Mood(Resource):
         def rescoreStress(row):
             new_score = row.score
 
-            if row.sodium < sodiumAvg - sodiumStd:
-                new_score = new_score * 2
-            if sodiumAvg - sodiumStd <= row.sodium <= sodiumAvg + sodiumStd:
-                new_score = new_score * 1.2
-            if row.sodium > sodiumAvg + sodiumStd:
-                new_score = new_score * 0.1
+            # Sodium
+            new_score = rescore_parameter(row.sodium, new_score, low=225, high=875, score_low=2, score_mid=0.8,
+                                          score_high=0.1)
 
-            if row.antistress == 0.1:
-                new_score = new_score * 10
-            if row.antistress == 0.2:
-                new_score = new_score * 20
-            if row.antistress >= 0.3:
-                new_score = new_score * 30
+            if row.antistress >= 0.1:
+                new_score = new_score * 2
+            elif 0.2 < row.antistress < 0.3:
+                new_score = new_score * 3
+            else:
+                new_score = new_score * 4
 
             return new_score
 
@@ -411,12 +408,6 @@ class Mood(Resource):
             new_score = rescore_parameter(row.sugars, row.score, low=6, high=18, score_low=2, score_mid=0.8,
                                           score_high=0.1)
             return new_score
-
-        def rescoreCoffe(row):
-            if lang == 'it':
-                return rescore_bad_food(row, 'caffè')
-            else:
-                return rescore_bad_food(row, 'coffee')
 
         def rescore_good_food(row, food):
             listIngredients = row.ingredients.strip("[ ]").split(",")
@@ -774,34 +765,8 @@ class Mood(Resource):
             score = row.ratingValue * np.log10(row.ratingCount)
             return score
 
-        # MARKER create dataframe
-
+        # MARKER add column "score" to the dataframe
         df['score'] = df.apply(score, axis=1)
-
-        # calcolo medie prima di 'tagliare' il DataFrame
-        # sugarAvg = df.sugars.mean()
-        # sugarStd = df.sugars.std()
-
-        # proteinsAvg = df.proteins.mean()
-        # proteinsStd = df.proteins.std()
-
-        # caloriesAvg = df.calories.mean()
-        # caloriesStd = df.calories.std()
-
-        # fatAvg = df.fat.mean()
-        # fatStd = df.fat.std()
-
-        # sFatAvg = df.saturatedFat.mean()
-        # sFatStd = df.saturatedFat.std()
-
-        sodiumAvg = df.sodium.mean()
-        sodiumStd = df.sodium.std()
-
-        # carbsAvg = df.carbohydrates.mean()
-        # carbsStd = df.carbohydrates.std()
-
-        # fiberAvg = df.fibers.mean()
-        # fiberStd = df.fibers.std()
 
         # MARKER get request.args
         n = int(request.args.get('n')) if (request.args.get('n') is not None) else -1
@@ -840,18 +805,6 @@ class Mood(Resource):
 
         bmi = float(request.args.get('fatclass')) if (request.args.get('fatclass') is not None) else ''
 
-        healthy = request.args.get('healthy')
-
-        # MARKER filtro DF ricette salutari - https://acmrecsys.github.io/rsss2019/Food-Recommender-ctrattner.pdf
-        if healthy == 'high':
-            df = df[(df.sugars <= 5) & (df.fat <= 3) & (df.saturatedFat <= 1.5)]
-        elif healthy == 'medium':
-            df = df[(df.sugars >= 5) & (df.sugars <= 15) &
-                    (df.fat >= 3) & (df.fat <= 20) &
-                    (df.saturatedFat >= 1.5) & (df.saturatedFat <= 5)]
-        elif healthy == 'low':
-            df = df[(df.sugars >= 15) & (df.fat >= 20) & (df.saturatedFat > 5) & (df.sodium >= 1.5)]
-
         # MARKER filtro il DataFrame su nome della ricetta cercata
         if recipeName:
             df = df[df.title.str.contains(recipeName, case=False)]
@@ -860,11 +813,7 @@ class Mood(Resource):
         if ingredient:
             df = dfFromIngredient(df, ingredient)
 
-        # MARKER change score for category
-        # categories = df.category.unique()
-        # ['Dolci', 'Primi piatti', 'Lievitati', 'Salse e Sughi', 'Piatti Unici', 'Contorni', 'Antipasti',
-        # 'Secondi piatti','Torte salate', 'Bevande', 'Insalate', 'Marmellate e Conserve']
-
+        # MARKER change score for category - 'Primi piatti', 'Secondi piatti', 'Dolci'
         if category:
             df = df[df.category == category]
 
@@ -996,7 +945,10 @@ class Mood(Resource):
         if stress == 'yes':
             df['antistress'] = df.ingredients.apply(isAntistress)
             df.score = df.apply(rescoreStress, axis=1)
-            df.score = df.apply(rescoreCoffe, axis=1)
+            if lang == 'it':
+                df.score = df.apply(rescore_bad_food, axis=1, food='caffè')
+            else:
+                df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
             df = df.sort_values('score', ascending=False)
 
         # MARKER change score if sleep == 'low'
@@ -1004,7 +956,6 @@ class Mood(Resource):
         if sleep == 'low':
             df['magnesium'] = df.ingredients.apply(isRichMagnesium)
             df.score = df.apply(rescoreMagnesium, axis=1)
-            df.score = df.apply(rescoreCoffe, axis=1)
             df.score = df.apply(rescoreSleep, axis=1)
             if lang == 'it':
                 df.score = df.apply(rescore_good_food, axis=1, food='mandorle')
@@ -1021,6 +972,7 @@ class Mood(Resource):
                 df.score = df.apply(rescore_good_food, axis=1, food='formaggio')
                 df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
                 df.score = df.apply(rescore_good_food, axis=1, food='avena')
+                df.score = df.apply(rescore_bad_food, axis=1, food='caffè')
             else:
                 df.score = df.apply(rescore_good_food, axis=1, food='almond')
                 df.score = df.apply(rescore_good_food, axis=1, food='turkey')
@@ -1036,18 +988,27 @@ class Mood(Resource):
                 df.score = df.apply(rescore_good_food, axis=1, food='cheese')
                 df.score = df.apply(rescore_good_food, axis=1, food='yogurt')
                 df.score = df.apply(rescore_good_food, axis=1, food='oat')
+                df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
 
         # MARKER change score if hour == 'evening' - sera => ricalcolo il caffe
         if hour == 'evening':
-            df.score = df.apply(rescoreCoffe, axis=1)
+            if lang == 'it':
+                df.score = df.apply(rescore_bad_food, axis=1, food='caffè')
+                df.score = df.apply(rescore_bad_food, axis=1, food='cioccolato')
+            else:
+                df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
+                df.score = df.apply(rescore_bad_food, axis=1, food='chocolate')
 
         # MARKER change score if depression == 'yes'
         # depressione => meno grassi
         if depression == 'yes':
             df['magnesium'] = df.ingredients.apply(isRichMagnesium)
             df.score = df.apply(rescoreDepression, axis=1)
-            df.score = df.apply(rescoreCoffe, axis=1)
             df.score = df.apply(rescoreMagnesium, axis=1)
+            if lang == 'it':
+                df.score = df.apply(rescore_bad_food, axis=1, food='caffè')
+            else:
+                df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
             df = df.sort_values('score', ascending=False)
 
         # MARKER change score for user_difficulty

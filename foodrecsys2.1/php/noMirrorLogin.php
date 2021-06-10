@@ -71,9 +71,11 @@
     $mainTypeExpl = "";
     $mainTypeExplA = "";
     $mainTypeExplB= "";
+
     $secondTypeExpl= "";
     $secondTypeExplA= "";
     $secondTypeExplB= "";
+
     $dessertTypeExpl= "";
     $dessertTypeExplA= "";
     $dessertTypeExplB= "";
