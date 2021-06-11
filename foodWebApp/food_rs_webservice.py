@@ -89,7 +89,7 @@ class Mood(Resource):
         def rescore_parameter(param, score_update, low, high, score_low, score_mid, score_high):
 
             if score_low is not None:
-                if param < low:
+                if param <= low:
                     score_update = score_update * score_low
                 elif low < param < high:
                     score_update = score_update * score_mid
@@ -348,8 +348,8 @@ class Mood(Resource):
             new_score = row.score
 
             # calories
-            new_score = rescore_parameter(row.calories, new_score, low=133.5, high=400.5, score_low=2, score_mid=1.2,
-                                          score_high=0.1)
+            new_score = rescore_parameter(row.calories, new_score, low=133.5, high=400.5, score_low=0.1, score_mid=1.2,
+                                          score_high=2)
             # fat
             new_score = rescore_parameter(row.proteins, new_score, low=3.35, high=10.05, score_low=0.1, score_mid=1.2,
                                           score_high=2)
@@ -390,7 +390,7 @@ class Mood(Resource):
                                           score_mid=0.8,
                                           score_high=0.1)
 
-            new_score = rescore_parameter(row.sugars, row.score, low=6, high=18, score_low=2,
+            new_score = rescore_parameter(row.sugars, new_score, low=6, high=18, score_low=2,
                                           score_mid=0.8,
                                           score_high=0.1)
 
@@ -500,8 +500,9 @@ class Mood(Resource):
         def rescoreSleep(row):
             new_score = row.score
 
-            if row.fat > 13.95:
-                new_score = new_score * 0.1
+            # fat
+            new_score = rescore_parameter(row.saturatedFat, new_score, low=1.35, high=4.05, score_low=2, score_mid=0.8,
+                                          score_high=0.1)
 
             return new_score
 
@@ -513,40 +514,23 @@ class Mood(Resource):
                     new_score = new_score * 2
 
             if difficulty == 2:
-                if row.difficulty == 'Facile':
+                if row.difficulty == 'Facile' or row.difficulty == 'Molto facile':
                     new_score = new_score * 2
-                if row.difficulty == 'Molto facile':
-                    new_score = new_score * 1.5
 
             if difficulty == 3:
-                if row.difficulty == 'Media':
+                if row.difficulty == 'Media' or row.difficulty == 'Facile' or \
+                        row.difficulty == 'Molto facile':
                     new_score = new_score * 2
-                if row.difficulty == 'Facile':
-                    new_score = new_score * 1.5
-                if row.difficulty == 'Molto facile':
-                    new_score = new_score * 1.5
 
             if difficulty == 4:
-                if row.difficulty == 'Difficile':
+                if row.difficulty == 'Difficile' or row.difficulty == 'Media' or \
+                        row.difficulty == 'Facile' or row.difficulty == 'Molto facile':
                     new_score = new_score * 2
-                if row.difficulty == 'Media':
-                    new_score = new_score * 1.5
-                if row.difficulty == 'Facile':
-                    new_score = new_score * 1.5
-                if row.difficulty == 'Molto facile':
-                    new_score = new_score * 1.5
 
             if difficulty == 5:
-                if row.difficulty == 'Molto difficile':
+                if row.difficulty == 'Molto difficile' or row.difficulty == 'Difficile' or \
+                        row.difficulty == 'Media' or row.difficulty == 'Facile' or row.difficulty == 'Molto facile':
                     new_score = new_score * 2
-                if row.difficulty == 'Difficile':
-                    new_score = new_score * 1.5
-                if row.difficulty == 'Media':
-                    new_score = new_score * 1.5
-                if row.difficulty == 'Facile':
-                    new_score = new_score * 1.5
-                if row.difficulty == 'Molto facile':
-                    new_score = new_score * 1.5
 
             return new_score
 
@@ -774,7 +758,6 @@ class Mood(Resource):
         recipeName = request.args.get('recipeName')
         ingredient = request.args.get('ingredient')
         category = request.args.get('category')
-        cost = request.args.get('cost')
 
         isLowNickel = int(request.args.get('isLowNickel')) if (request.args.get('isLowNickel') is not None) else ''
         isVegetarian = int(request.args.get('isVegetarian')) if (request.args.get('isVegetarian') is not None) else ''
@@ -816,10 +799,6 @@ class Mood(Resource):
         # MARKER change score for category - 'Primi piatti', 'Secondi piatti', 'Dolci'
         if category:
             df = df[df.category == category]
-
-        # MARKER change score for cost
-        if cost:
-            df = df[df.cost == cost]
 
         # MARKER change score for restrictions
         if isLowNickel:
@@ -887,20 +866,18 @@ class Mood(Resource):
                 df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
 
         # MARKER change score for bmi value
-        bmiWeight = 'normal'
         if bmi < 19:
-            bmiWeight = 'under'
+            # SOTTOPESO
             df.score = df.apply(rescoreUnderweight, axis=1)
         elif 25 <= bmi < 30:
-            bmiWeight = 'over'
+            # SOVRAPPESO
             df.score = df.apply(rescoreOverweight, axis=1)
         elif 30 <= bmi < 35:
-            bmiWeight = 'over'
+            # OBESITÀ CLASSE I
             df.score = df.apply(rescoreObesity, axis=1)
         elif bmi >= 35:
-            bmiWeight = 'over'
+            # OBESITÀ CLASSE II
             df.score = df.apply(rescoreObesityPlus, axis=1)
-        df = df.sort_values('score', ascending=False)
 
         # MARKER change score if mood == 'bad'
         if mood == 'bad':
@@ -931,15 +908,12 @@ class Mood(Resource):
                 df.score = df.apply(rescore_good_food, axis=1, food='nuts')
                 df.score = df.apply(rescore_good_food, axis=1, food='beans')
                 df.score = df.apply(rescore_good_food, axis=1, food='lentils')
-            df = df.sort_values('score', ascending=False)
 
         # MARKER change score for activity
         if activity == 'medium':
             df.score = df.apply(rescoreActivityMedium, axis=1)
-            df = df.sort_values('score', ascending=False)
         elif activity == 'high':
             df.score = df.apply(rescoreActivityHigh, axis=1)
-            df = df.sort_values('score', ascending=False)
 
         # MARKER change score if stress == 'yes'
         if stress == 'yes':
@@ -949,10 +923,8 @@ class Mood(Resource):
                 df.score = df.apply(rescore_bad_food, axis=1, food='caffè')
             else:
                 df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
-            df = df.sort_values('score', ascending=False)
 
         # MARKER change score if sleep == 'low'
-        # poco sonno => mangia magnesio
         if sleep == 'low':
             df['magnesium'] = df.ingredients.apply(isRichMagnesium)
             df.score = df.apply(rescoreMagnesium, axis=1)
@@ -990,7 +962,7 @@ class Mood(Resource):
                 df.score = df.apply(rescore_good_food, axis=1, food='oat')
                 df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
 
-        # MARKER change score if hour == 'evening' - sera => ricalcolo il caffe
+        # MARKER change score if hour == 'evening'
         if hour == 'evening':
             if lang == 'it':
                 df.score = df.apply(rescore_bad_food, axis=1, food='caffè')
@@ -1000,7 +972,6 @@ class Mood(Resource):
                 df.score = df.apply(rescore_bad_food, axis=1, food='chocolate')
 
         # MARKER change score if depression == 'yes'
-        # depressione => meno grassi
         if depression == 'yes':
             df['magnesium'] = df.ingredients.apply(isRichMagnesium)
             df.score = df.apply(rescoreDepression, axis=1)
@@ -1009,36 +980,30 @@ class Mood(Resource):
                 df.score = df.apply(rescore_bad_food, axis=1, food='caffè')
             else:
                 df.score = df.apply(rescore_bad_food, axis=1, food='coffee')
-            df = df.sort_values('score', ascending=False)
 
         # MARKER change score for user_difficulty
         if user_difficulty != '':
             df.score = df.apply(rescoreDifficulty, difficulty=user_difficulty, axis=1)
-            df = df.sort_values('score', ascending=False)
 
         # MARKER change score for goal
         if goal != '':
             # se vuole prendere peso e non è sovrappeso
-            if bmiWeight != 'over' and goal == 1:
+            if goal == 1 and bmi < 25:
                 df.score = df.apply(rescoreGoalPlus, axis=1)
 
             # se vuole perdere peso e non è sottopeso
-            if bmiWeight != 'under' and goal == -1:
+            if goal == -1 and bmi > 19:
                 df.score = df.apply(rescoreGoalMinus, axis=1)
-
-            df = df.sort_values('score', ascending=False)
 
         # MARKER change score for user_cost - value '5' stands for 'not important', so we don't sway the recommender
         if user_cost != '':
             df.score = df.apply(rescoreCost, cost=user_cost, axis=1)
-            df = df.sort_values('score', ascending=False)
 
         # MARKER change score for user_time - value '0' stands for 'no costraints', so we don't sway the recommender
         if user_time != '':
             if user_time == 0:
                 user_time = 200
             df.score = df.apply(rescoreTime, time=user_time, axis=1)
-            df = df.sort_values('score', ascending=False)
 
         # MARKER change score for sex
         if sex == "M":
