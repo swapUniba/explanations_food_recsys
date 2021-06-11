@@ -2265,35 +2265,68 @@ class Explain(Resource):
 
         # web app request a specific type of explanation for every recipe(use if u want that same type of exp is shown)
         req_explanation_index = int(request.args.get('type'))
-        type_exp = one_recipe_experiment[req_explanation_index]
 
-        # print(type_exp)
+        # if the requested index is -1 -> it will returned every expl
+        if req_explanation_index == -1:
 
-        # expls a
-        expl = get_str_exp_one(user, recipeA_values, type_exp, listRestrictions, nutrients)
-        if expl != "":
-            type_for_recipe_a = type_exp + "A"
-            explWithTypeA = {type_for_recipe_a: expl}
-            explanations.update(explWithTypeA)
+            # expls type 1 a
+            for elem in one_recipe_experiment:
+                expl = get_str_exp_one(user, recipeA_values, elem, listRestrictions, nutrients)
+                if expl != "":
+                    type_for_recipe_a = elem + "A"
+                    explWithTypeA = {type_for_recipe_a: expl}
+                    explanations.update(explWithTypeA)
 
-        # expls b
-        expl = get_str_exp_one(user, recipeB_values, type_exp, listRestrictions, nutrients)
-        if expl != "":
-            type_for_recipe_b = type_exp + "B"
-            explWithTypeB = {type_for_recipe_b: expl}
-            explanations.update(explWithTypeB)
+            # expls type 1 b
+            for elem in one_recipe_experiment:
+                    expl = get_str_exp_one(user, recipeB_values, elem, listRestrictions, nutrients)
+                    if expl != "":
+                        type_for_recipe_b = elem + "B"
+                        explWithTypeB = {type_for_recipe_b: expl}
+                        explanations.update(explWithTypeB)
 
+            # expls type 2
+            for elem in two_recipes_experiment:
+                expl = get_str_exp_two(user,
+                                       recipeA_values,
+                                       recipeB_values,
+                                       elem,
+                                       listRestrictions,
+                                       nutrients)
+                if expl != "":
+                    explWithType = {elem: expl}
+                    explanations.update(explWithType)
 
-        type_exp = two_recipes_experiment[req_explanation_index]
-        expl = get_str_exp_two(user,
-                               recipeA_values,
-                               recipeB_values,
-                               type_exp,
-                               listRestrictions,
-                               nutrients)
-        if expl != "":
-            explWithType = {type_exp: expl}
-            explanations.update(explWithType)
+        else:
+
+            type_exp = one_recipe_experiment[req_explanation_index]
+            # print(type_exp)
+
+            # expls type 1 a
+            expl = get_str_exp_one(user, recipeA_values, type_exp, listRestrictions, nutrients)
+            if expl != "":
+                type_for_recipe_a = type_exp + "A"
+                explWithTypeA = {type_for_recipe_a: expl}
+                explanations.update(explWithTypeA)
+
+            # expls type 1 b
+            expl = get_str_exp_one(user, recipeB_values, type_exp, listRestrictions, nutrients)
+            if expl != "":
+                type_for_recipe_b = type_exp + "B"
+                explWithTypeB = {type_for_recipe_b: expl}
+                explanations.update(explWithTypeB)
+
+            # expls type 2
+            type_exp = two_recipes_experiment[req_explanation_index]
+            expl = get_str_exp_two(user,
+                                   recipeA_values,
+                                   recipeB_values,
+                                   type_exp,
+                                   listRestrictions,
+                                   nutrients)
+            if expl != "":
+                explWithType = {type_exp: expl}
+                explanations.update(explWithType)
 
         # print(explanations)
 
