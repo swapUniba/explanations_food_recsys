@@ -377,8 +377,8 @@ class Mood(Resource):
         def rescoreDepression(row):
             new_score = row.score
 
-            # Saturated Fat
-            new_score = rescore_parameter(row.saturatedFat, new_score, low=1.35, high=4.05, score_low=0.1,
+            # fat
+            new_score = rescore_parameter(row.fat, new_score, low=4.65, high=13.95, score_low=0.1,
                                           score_mid=1.2,
                                           score_high=2)
             # carbohydrates
@@ -386,6 +386,7 @@ class Mood(Resource):
                                           score_mid=1.2,
                                           score_high=2)
 
+            #proteins
             new_score = rescore_parameter(row.proteins, new_score, low=3.35, high=10.05, score_low=2,
                                           score_mid=0.8,
                                           score_high=0.1)
@@ -512,25 +513,35 @@ class Mood(Resource):
             if difficulty == 1:
                 if row.difficulty == 'Molto facile':
                     new_score = new_score * 2
+                else:
+                    new_score = new_score * 0.1
 
             if difficulty == 2:
                 if row.difficulty == 'Facile' or row.difficulty == 'Molto facile':
                     new_score = new_score * 2
+                else:
+                    new_score = new_score * 0.1
 
             if difficulty == 3:
                 if row.difficulty == 'Media' or row.difficulty == 'Facile' or \
                         row.difficulty == 'Molto facile':
                     new_score = new_score * 2
+                else:
+                    new_score = new_score * 0.1
 
             if difficulty == 4:
                 if row.difficulty == 'Difficile' or row.difficulty == 'Media' or \
                         row.difficulty == 'Facile' or row.difficulty == 'Molto facile':
                     new_score = new_score * 2
+                else:
+                    new_score = new_score * 0.1
 
             if difficulty == 5:
                 if row.difficulty == 'Molto difficile' or row.difficulty == 'Difficile' or \
                         row.difficulty == 'Media' or row.difficulty == 'Facile' or row.difficulty == 'Molto facile':
                     new_score = new_score * 2
+                else:
+                    new_score = new_score * 0.1
 
             return new_score
 
@@ -546,7 +557,7 @@ class Mood(Resource):
                                           score_mid=1.2,
                                           score_high=2)
             # proteins
-            new_score = rescore_parameter(row.calories, new_score, low=3.35, high=10.05, score_low=0.1,
+            new_score = rescore_parameter(row.proteins, new_score, low=3.35, high=10.05, score_low=0.1,
                                           score_mid=1.2,
                                           score_high=2)
 
@@ -556,17 +567,23 @@ class Mood(Resource):
             new_score = row.score
 
             # calories
-            new_score = rescore_parameter(row.calories, new_score, low=133.35, high=400.5, score_low=0.1,
-                                          score_mid=1.2,
-                                          score_high=2)
+            new_score = rescore_parameter(row.calories, new_score, low=133.5, high=400.5, score_low=2, score_mid=0.8,
+                                          score_high=0.1)
+            # fat
+            new_score = rescore_parameter(row.fat, new_score, low=4.65, high=13.95, score_low=2, score_mid=0.8,
+                                          score_high=0.1)
+
             # carbohydrates
-            new_score = rescore_parameter(row.carbohydrates, new_score, low=18, high=54, score_low=0.1,
-                                          score_mid=1.2,
+            new_score = rescore_parameter(row.carbohydrates, new_score, low=18, high=54, score_low=2, score_mid=0.8,
+                                          score_high=0.1)
+
+            # fibers
+            new_score = rescore_parameter(row.fibers, new_score, low=1.65, high=4.95, score_low=0.1, score_mid=1.2,
                                           score_high=2)
-            if row.fat < 4.65:
-                new_score = new_score * 2
-            if row.fat > 13.95:
-                new_score = new_score * 0.1
+
+            # proteins
+            new_score = rescore_parameter(row.proteins, new_score, low=3.35, high=10.05, score_low=0.1, score_mid=1.2,
+                                          score_high=2)
 
             return new_score
 
@@ -581,32 +598,24 @@ class Mood(Resource):
                     new_score = new_score * 0.1
 
             if cost == 2:
-                if row.cost == 'Basso':
+                if row.cost == 'Basso' or row.cost == 'Molto basso':
                     new_score = new_score * 2
-                elif row.cost == 'Molto basso':
-                    new_score = new_score * 1.5
                 else:
                     new_score = new_score * 0.1
 
             if cost == 3:
-                if row.cost == 'Medio':
+                if row.cost == 'Medio' or row.cost == 'Basso' or \
+                        row.cost == 'Molto basso':
                     new_score = new_score * 2
-                elif row.cost == 'Basso':
-                    new_score = new_score * 1.5
-                elif row.cost == 'Molto basso':
-                    new_score = new_score * 1.5
                 else:
                     new_score = new_score * 0.1
 
             if cost == 4:
-                if row.cost == 'Elevato':
+                if row.cost == 'Elevato' or row.cost == 'Medio' or \
+                        row.cost == 'Basso' or row.cost == 'Molto basso':
                     new_score = new_score * 2
-                elif row.cost == 'Medio':
-                    new_score = new_score * 1.5
-                elif row.cost == 'Basso':
-                    new_score = new_score * 1.5
-                elif row.cost == 'Molto basso':
-                    new_score = new_score * 1.5
+                else:
+                    new_score = new_score * 0.1
 
             return new_score
 
@@ -622,11 +631,11 @@ class Mood(Resource):
                 i -= 1
 
             if time == totalTime:
+                new_score = new_score * 1.5
+            elif time > totalTime:
                 new_score = new_score * 2
             elif time < totalTime:
                 new_score = new_score * 0.1
-            elif time > totalTime:
-                new_score = new_score * 1.5
 
             return new_score
 
@@ -698,7 +707,7 @@ class Mood(Resource):
             new_score = rescore_parameter(row.fibers, new_score, low=1.65, high=4.95, score_low=0.1,
                                           score_mid=1.2,
                                           score_high=2)
-            #  Fat
+            #  saturatedFat
             new_score = rescore_parameter(row.saturatedFat, new_score, low=4.65, high=13.95, score_low=0.1,
                                           score_mid=1.2,
                                           score_high=2)
@@ -987,7 +996,7 @@ class Mood(Resource):
 
         # MARKER change score for goal
         if goal != '':
-            # se vuole prendere peso e non è sovrappeso
+            # se vuole aumentare di peso e non è sovrappeso
             if goal == 1 and bmi < 25:
                 df.score = df.apply(rescoreGoalPlus, axis=1)
 
@@ -1000,16 +1009,14 @@ class Mood(Resource):
             df.score = df.apply(rescoreCost, cost=user_cost, axis=1)
 
         # MARKER change score for user_time - value '0' stands for 'no costraints', so we don't sway the recommender
-        if user_time != '':
-            if user_time == 0:
-                user_time = 200
+        if user_time != '' and user_time != 0:
             df.score = df.apply(rescoreTime, time=user_time, axis=1)
 
         # MARKER change score for sex
-        if sex == "M":
-            df.score = df.apply(rescore_sex_M, axis=1)
-        else:
-            df.score = df.apply(rescore_sex_F, axis=1)
+        # if sex == "M":
+        #     df.score = df.apply(rescore_sex_M, axis=1)
+        # if sex == "F":
+        #     df.score = df.apply(rescore_sex_F, axis=1)
 
         # MARKER change score for age
         if age == 'U20':
@@ -1032,14 +1039,14 @@ class Mood(Resource):
             df.score = df.apply(rescoreU60, axis=1)
             df['calcium'] = df.ingredients.apply(isRichCalcium)
             df.score = df.apply(rescoreCalcium, axis=1)
-            df['vitaminD'] = df.ingredients.apply(isRichCalcium)
-            df.score = df.apply(rescoreCalcium, axis=1)
+            df['vitaminD'] = df.ingredients.apply(isRichVitaminD)
+            df.score = df.apply(rescoreVitaminD, axis=1)
         elif age == 'O60':
             df.score = df.apply(rescoreO60, axis=1)
             df['calcium'] = df.ingredients.apply(isRichCalcium)
             df.score = df.apply(rescoreCalcium, axis=1)
-            df['vitaminD'] = df.ingredients.apply(isRichCalcium)
-            df.score = df.apply(rescoreCalcium, axis=1)
+            df['vitaminD'] = df.ingredients.apply(isRichVitaminD)
+            df.score = df.apply(rescoreVitaminD, axis=1)
 
         # MARKER sort dataframe by score value
         df = df.sort_values('score', ascending=False)
