@@ -280,8 +280,8 @@ $_SESSION['dessertTypeExplB'] = "";
                                         <div class="col-sm-5">
                                             <select class="form-control" id="goalSelector" name="goal" required>
                                                 <option hidden disabled selected value></option>
-                                                <option value="1">Lose weight</option>
-                                                <option value="-1">Gain weight</option>
+                                                <option value="-1">Lose weight</option>
+                                                <option value="1">Gain weight</option>
                                                 <option value="0">No goals</option>
                                             </select>
                                         </div>
