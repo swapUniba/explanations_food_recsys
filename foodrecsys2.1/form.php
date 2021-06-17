@@ -3,7 +3,7 @@
 @session_start();
 //type of explanation
 //decide to show expl [ 0 ==> no explanation - 1 ==> single recipe explanations - 2 == double expl]
-// $showExpl = rand(0, 2);
+//$showExpl = rand(0, 2);
 $showExpl = 0;
 $_SESSION['showExpl'] = $showExpl;
 $_SESSION['mainTypeExpl'] = "";
@@ -14,7 +14,7 @@ $_SESSION['mainTypeExplA'] = "";
 $_SESSION['secondTypeExplA'] = "";
 $_SESSION['dessertTypeExplA'] = "";
 
-$_SESSION['mainTypeExplB'] ="";
+$_SESSION['mainTypeExplB'] = "";
 $_SESSION['secondTypeExplB'] = "";
 $_SESSION['dessertTypeExplB'] = "";
 ?>
@@ -56,9 +56,6 @@ $_SESSION['dessertTypeExplB'] = "";
                                                 <label class="form-check-label" for="notsay">Prefer not to say</label>
                                             </div>
                                         </div>
-
-
-
 
                                         <label for="age" class="col-sm-2 col-form-label offset-sm-1">Your age is:</label>
                                         <div class="col-sm-2" style="padding-right : 0px; margin-right : 0px;">
