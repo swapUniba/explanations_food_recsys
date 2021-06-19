@@ -13,7 +13,7 @@ class Mood(Resource):
     def get(self):
 
         url_dataset_it = "dataset.csv"
-        url_dataset_en = "dataset_en.csv"
+        url_dataset_en = "dataset_en_v2.csv"
 
         lang = request.args.get('lang')
 
