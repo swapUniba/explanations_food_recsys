@@ -635,7 +635,7 @@ class Mood(Resource):
             elif time > totalTime:
                 new_score = new_score * 2
             elif time < totalTime:
-                new_score = new_score * 0.5
+                new_score = new_score * 0.1
 
             return new_score
 
