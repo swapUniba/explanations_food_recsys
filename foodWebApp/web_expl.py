@@ -2172,7 +2172,7 @@ class Explain(Resource):
 
         recipeA_url = request.args.get('imgurl1')
         recipeB_url = request.args.get('imgurl2')
-        url_dataset_en = 'dataset_en.csv'
+        url_dataset_en = 'dataset_en_v2.csv'
 
         # df = pd.read_csv(url_dataset_en)
 
