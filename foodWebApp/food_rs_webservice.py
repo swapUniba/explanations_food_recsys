@@ -1039,7 +1039,7 @@ class Mood(Resource):
         # MARKER sort dataframe by score value
         df = df.sort_values('score', ascending=False)
 
-        print(df[['title', 'score']].head(n))
+        # print(df[['title', 'score']].head(n))
 
         return df.head(n).to_json(orient='split')
 
