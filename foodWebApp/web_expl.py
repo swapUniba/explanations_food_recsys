@@ -2187,7 +2187,7 @@ class Explain(Resource):
         restrictions = json.loads(dataRestrictions)
         listRestrictions = list(restrictions["one"].keys())
 
-        df = pd.read_csv(url_dataset_en)
+        df = pd.read_csv(url_dataset_en, sep=';')
 
         recipeA_values = {}
         recipeB_values = {}
