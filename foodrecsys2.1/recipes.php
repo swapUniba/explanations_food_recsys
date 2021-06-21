@@ -19,7 +19,6 @@ if(isset($_POST['prevDish'])) {
 
 @session_start();
 
-
 ?>
 
 <!DOCTYPE html>

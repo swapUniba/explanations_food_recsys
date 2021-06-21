@@ -17,6 +17,7 @@ $_SESSION['dessertTypeExplA'] = "";
 $_SESSION['mainTypeExplB'] = "";
 $_SESSION['secondTypeExplB'] = "";
 $_SESSION['dessertTypeExplB'] = "";
+
 ?>
 <html lang="en">
     <?php include "php/head.php"; ?>

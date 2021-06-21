@@ -88,7 +88,8 @@
         $height = $_POST['height'] / 100;
         $weight = $_POST['weight'];
 
-        $fatclass = ($weight * 1.3) / ($height ** 2.5);
+        //$fatclass = ($weight * 1.3) / ($height ** 2.5);
+        $fatclass = ($weight * 1.3) / (pow($height, 2.5));
 
         $health_style = $_POST['HS'];
         $health_condition = $_POST['HC'];
