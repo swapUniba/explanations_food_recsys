@@ -14,13 +14,16 @@ class Mood(Resource):
 
         url_dataset_it = "dataset.csv"
         url_dataset_en = "dataset_en.csv"
+        url_dataset_en_v2 = "dataset_en_v2.csv"
 
         lang = request.args.get('lang')
 
         if lang == 'it':
             df = pd.read_csv(url_dataset_it)
         else:
-            df = pd.read_csv(url_dataset_en)
+            # df = pd.read_csv(url_dataset_en)
+            df = pd.read_csv(url_dataset_en_v2, sep=';')
+
 
         # rich ingridients list
         richCalciumList = ["tofu", "latte", "yogurt", "parmigiano", "spinaci",
@@ -1035,6 +1038,8 @@ class Mood(Resource):
 
         # MARKER sort dataframe by score value
         df = df.sort_values('score', ascending=False)
+
+        print(df[['title', 'score']].head(n))
 
         return df.head(n).to_json(orient='split')
 
