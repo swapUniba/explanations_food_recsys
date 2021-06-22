@@ -1003,13 +1003,10 @@ class Explain(Resource):
         def userTime_one(user_time, recipe_values):
             explanation = ""
             # time calculation from string ( PM123...4 into the dataset)
-            i = len(recipe_values['totalTime']) - 2
-            potenzaDieci = 1
-            recipe_prepTime = 0
-            while i >= 2:
-                recipe_prepTime = recipe_prepTime + int(recipe_values['totalTime'][i]) * potenzaDieci
-                potenzaDieci = potenzaDieci * 10
-                i -= 1
+
+            time_split = recipe_values['totalTime'].split(sep='.')
+
+            recipe_prepTime = int(time_split[1]) * 60 + int(time_split[2])
 
             # value 0 stands for 'no constraints'
             if user_time != 0:
@@ -1030,22 +1027,16 @@ class Explain(Resource):
         def userTime_two(user_time, recipeA_values, recipeB_values):
             explanation = ""
             # time calculation from string  for first recipe( PM123...4 into the dataset)
-            i = len(recipeA_values['totalTime']) - 2
-            potenzaDieci = 1
-            recipeA_prepTime = 0
-            while i >= 2:
-                recipeA_prepTime = recipeA_prepTime + int(recipeA_values['totalTime'][i]) * potenzaDieci
-                potenzaDieci = potenzaDieci * 10
-                i -= 1
+
+            time_split = recipeA_values['totalTime'].split(sep='.')
+
+            recipeA_prepTime = int(time_split[1]) * 60 + int(time_split[2])
 
             # time calculation from string  for first recipe( PM123...4 into the dataset)
-            i = len(recipeB_values['totalTime']) - 2
-            potenzaDieci = 1
-            recipeB_prepTime = 0
-            while i >= 2:
-                recipeB_prepTime = recipeB_prepTime + int(recipeB_values['totalTime'][i]) * potenzaDieci
-                potenzaDieci = potenzaDieci * 10
-                i -= 1
+
+            time_split = recipeB_values['totalTime'].split(sep='.')
+
+            recipeB_prepTime = int(time_split[1]) * 60 + int(time_split[2])
 
             if recipeA_prepTime < recipeB_prepTime:
                 explanation = recipeA_values['title'] + " can be prepared in less time (" \
