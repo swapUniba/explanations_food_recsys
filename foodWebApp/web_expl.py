@@ -2189,25 +2189,25 @@ class Explain(Resource):
             if row["imageURL"] == recipeB_url:
                 recipeB_values = row
 
-        if np.isnan(recipeA_values["sodium"]):
-            recipeA_values["sodium"] = 0
-        else:
+        if 'sodium' in recipeA_values:
             recipeA_values["sodium"] = recipeA_values["sodium"] / 1000
-
-        if np.isnan(recipeB_values["sodium"]):
-            recipeB_values["sodium"] = 0
         else:
+            recipeA_values["sodium"] = 0
+
+        if 'sodium' in recipeB_values:
             recipeB_values["sodium"] = recipeB_values["sodium"] / 1000
-
-        if np.isnan(recipeA_values["cholesterol"]):
-            recipeA_values["cholesterol"] = 0
         else:
+            recipeB_values["sodium"] = 0
+
+        if 'cholesterol' in recipeA_values:
             recipeA_values["cholesterol"] = recipeA_values["cholesterol"] / 1000
-
-        if np.isnan(recipeB_values["cholesterol"]):
-            recipeB_values["cholesterol"] = 0
         else:
+            recipeA_values["cholesterol"] = 0
+
+        if 'cholesterol' in recipeB_values:
             recipeB_values["cholesterol"] = recipeB_values["cholesterol"] / 1000
+        else:
+            recipeB_values["cholesterol"] = 0
 
         user = {
             'Age': request.args.get('user_age'),  # U20/U30/U40/U50/U60/060
