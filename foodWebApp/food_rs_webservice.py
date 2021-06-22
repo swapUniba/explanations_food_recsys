@@ -625,13 +625,9 @@ class Mood(Resource):
         def rescoreTime(row, time):
             new_score = row.score
 
-            i = len(row.totalTime) - 2
-            potenzaDieci = 1
-            totalTime = 0
-            while i >= 2:
-                totalTime = totalTime + int(row.totalTime[i]) * potenzaDieci
-                potenzaDieci = potenzaDieci * 10
-                i -= 1
+            time_split = row.totalTime.split(sep='.')
+
+            totalTime = int(time_split[1]) * 60 + int(time_split[2])
 
             if time == totalTime:
                 new_score = new_score * 1.5
