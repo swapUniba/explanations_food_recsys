@@ -220,7 +220,7 @@
                 break;
             case 2: //double recipe explanations
                 if (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["main_exp"])){
-                    $explanations["main_exp"] = array($typeExpsTwo[$expMainIndex] => "");
+                    $explanations["main_exp"] += array($typeExpsTwo[$expMainIndex] => "");
                 }
                 $mainTypeExpl = $typeExpsTwo[$expMainIndex];
                 break;
@@ -252,7 +252,7 @@
                 break;
             case 2:
                 if (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["second_exp"])){
-                    $explanations["second_exp"] = array($typeExpsTwo[$expMainIndex] => "");
+                    $explanations["second_exp"] += array($typeExpsTwo[$expMainIndex] => "");
                 }
                 $secondTypeExpl = $typeExpsTwo[$expSecondIndex];
                 break;
@@ -284,7 +284,7 @@
                 break;
             case 2:
                 if (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["dessert_exp"])){
-                    $explanations["dessert_exp"] = array($typeExpsTwo[$expMainIndex] => "");
+                    $explanations["dessert_exp"] += array($typeExpsTwo[$expMainIndex] => "");
                 }
                 $dessertTypeExpl = $typeExpsTwo[$expDessertIndex];
                 break;

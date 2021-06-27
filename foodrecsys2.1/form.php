@@ -3,8 +3,7 @@
 @session_start();
 //type of explanation
 //decide to show expl [ 0 ==> no explanation - 1 ==> single recipe explanations - 2 == double expl]
-//$showExpl = rand(0, 2);
-$showExpl = 0;
+$showExpl = rand(0, 2);
 $_SESSION['showExpl'] = $showExpl;
 $_SESSION['mainTypeExpl'] = "";
 $_SESSION['secondTypeExpl'] = "";
