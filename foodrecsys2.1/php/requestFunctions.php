@@ -9,7 +9,7 @@ function getLogData(){
     return $data;
 }
 
-function createURL_old($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $exp){
+function createURL_old($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant, $exp){
     $url = "http://localhost:5002/mood/?";
 
     if($mood == 'Bad')
@@ -30,6 +30,10 @@ function createURL_old($mood, $stress, $depression, $fatclass, $activity, $sleep
         $url = $url . "sleep=low&";
     if($vegetarian)
         $url = $url . "isVegetarian=1&";
+    if($diabetes)
+        $url = $url . "isDiabetes=1&";
+    if($pregnant)
+        $url = $url . "isPregnant=1&";
     if($lactose)
         $url = $url . "isLactoseFree=1&";
     if($gluten)
@@ -45,7 +49,7 @@ function createURL_old($mood, $stress, $depression, $fatclass, $activity, $sleep
     return $url;
 }
 
-function createURL($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $exp, $user_time, $user_cost, $age, $goal){
+function createURL($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant, $exp, $user_time, $user_cost, $age, $goal){
     $url = "http://localhost:5009/mood/?";
 
     if($mood == 'Bad')
@@ -63,6 +67,10 @@ function createURL($mood, $stress, $depression, $fatclass, $activity, $sleep, $v
         $url = $url . "sleep=low&";
     if($vegetarian)
         $url = $url . "isVegetarian=1&";
+    if($diabetes)
+        $url = $url . "isDiabetes=1&";
+    if($pregnant)
+        $url = $url . "isPregnant=1&";
     if($lactose)
         $url = $url . "isLactoseFree=1&";
     if($gluten)
@@ -86,7 +94,7 @@ function createURL($mood, $stress, $depression, $fatclass, $activity, $sleep, $v
 function createUrlExp(
 		$mood, $stress, $depression,
 		$fatclass, $health_style, $health_condition, $activity, $sleep,
-		$vegetarian, $lactose, $gluten, $nickel, $light,
+		$vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
 		$user_time, $user_cost, $age, $goal,
 		$user_difficulty, $imgurlA, $imgurlB,
         $userFavIngredient, $type_explanation)
@@ -167,14 +175,16 @@ function createUrlExp(
                 $url = $url . "goal=no&";
         }
 
-
-
         //RESTRICTION & INGREDIENTS
         $restrictions = [];
 
         //RESTRICTION
         if($vegetarian)
             array_push($restrictions,"vegetarian");
+        if($diabetes)
+            array_push($restrictions,"diabetes");
+        if($pregnant)
+            array_push($restrictions,"pregnant");
         if($lactose)
             array_push($restrictions,"lactosefree");
         if($gluten)
@@ -184,16 +194,11 @@ function createUrlExp(
         if($light)
             array_push($restrictions,"light");
 
-
         if(count($restrictions) > 0)
             $url = $url . "restr=" . urlencode(implode(",",$restrictions)) . "&";
 
-
         //INGREDIENTS
         $url = $url . "user_ingredients=" . $userFavIngredient . "&";
-
-
-
 
         //IMGURL
         $url = $url

@@ -1,8 +1,6 @@
 <?php
 	
 	$dish = $_POST['dish'];
-	#type explanation to get the same type for every recipe (if u want to use the feature, manage in the explanation service)
-	$type_explanation = rand(0, 13);
 
 	$showExpl = $_SESSION['showExpl'];
 
@@ -24,6 +22,7 @@
         "userAge_two",
         "descriptions"
     );
+
     //type exps single A
     $typeExpsOneA = array (
         "popularity_oneA",
@@ -42,6 +41,7 @@
         "userAge_oneA",
         "descriptionA"
     );
+
     //type exps single B
     $typeExpsOneB = array (
         "popularity_oneB",
@@ -60,16 +60,23 @@
         "userAge_oneB",
         "descriptionB"
     );
-    //for the experiment I use a random exp, one of these random, different for every dish
+
+	// explanation index to get the same type of explanation for every dish
+	// $type_explanation = rand(0, count($typeExpsTwo) - 1);
+
+    // explanation indexes to get the different explanations for every dishes
     $expMainIndex = rand(0, count($typeExpsTwo) - 1);
     $expSecondIndex = rand(0, count($typeExpsTwo) - 1);
     $expDessertIndex = rand(0, count($typeExpsTwo) - 1);
+
     $mainTypeExpl = "";
     $mainTypeExplA = "";
     $mainTypeExplB= "";
+
     $secondTypeExpl= "";
     $secondTypeExplA= "";
     $secondTypeExplB= "";
+
     $dessertTypeExpl= "";
     $dessertTypeExplA= "";
     $dessertTypeExplB= "";
@@ -78,9 +85,12 @@
 	if(($dish == "main") || ($dish == "main_exp") ){
         $sex = $_POST['sexOption'];
         $age = $_POST['age'];
-        $height = $_POST['height'];
+        $height = $_POST['height'] / 100;
         $weight = $_POST['weight'];
-        $fatclass = ($weight * 10000) / ($height * $height);
+
+        //$fatclass = ($weight * 1.3) / ($height ** 2.5);
+        $fatclass = ($weight * 1.3) / (pow($height, 2.5));
+
         $health_style = $_POST['HS'];
         $health_condition = $_POST['HC'];
         $health_food_choise = $_POST['HFC'];
@@ -122,6 +132,22 @@
             $vegetarian = false;
         }
 
+        if(isset($_POST['diabetes'])){
+            $diabetes = $_POST['diabetes'];
+            $answers = $answers . "-diabetes-";
+        }
+        else{
+            $diabetes = false;
+        }
+
+        if(isset($_POST['pregnant'])){
+            $pregnant = $_POST['pregnant'];
+            $answers = $answers . "-pregnant-";
+        }
+        else{
+            $pregnant = false;
+        }
+
         if(isset($_POST['lactose'])){
             $lactose = $_POST['lactose'];
             $answers = $answers . "-lactosefree-";
@@ -154,31 +180,15 @@
             $light = false;
         }
 
-
         $answers = $answers . ',';
 
-        /*$underweight = false;
-                $overweight = false;
-                if($fatclass < 19)
-                    $underweight = true;
-                if($fatclass >= 25)
-                    $overweight = true;
-                 */
-
-
-
-
         $url_old = createURL_old($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose,
-            $gluten, $nickel, $light, $user_difficulty);
+            $gluten, $nickel, $light, $diabetes, $pregnant, $user_difficulty);
         $url_new = createURL($mood, $stress, $depression, $fatclass, $activity, $sleep, $vegetarian, $lactose,
-            $gluten, $nickel, $light, $user_difficulty, $user_time, $user_cost, $age, $goal);
-
-
-		
+            $gluten, $nickel, $light, $diabetes, $pregnant, $user_difficulty, $user_time, $user_cost, $age, $goal);
 		
 		//here is created the recommendation
         $data = getRecipes($url_new, $url_old);
-		//$data = getRecipes(createURL($mood, $stress, $depression, $underweight, $overweight, $activity, $sleep, $vegetarian, $lactose, $gluten, $nickel, $light, $exp));
 		
 		$explanations = [];
 		
@@ -188,27 +198,29 @@
 		$explanations["main_exp"] = getExplanation(createUrlExp(
                 $mood, $stress, $depression,
                 $fatclass, $health_style, $health_condition, $activity, $sleep,
-                $vegetarian, $lactose, $gluten, $nickel, $light,
+                $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
                 $user_time, $user_cost, $age, $goal,
                 $user_difficulty, $imgurlA, $imgurlB,
-                $userFavIngredients, $type_explanation)
+                $userFavIngredients, $expMainIndex)
 		);
+
 		switch ($showExpl){
             case 0: //no expl
                 break;
             case 1: //single recipe explanations in one
-                while (! (array_key_exists($typeExpsOneB[$expMainIndex], $explanations["main_exp"])) and
-                    array_key_exists($typeExpsOneA[$expMainIndex],$explanations["main_exp"]) )
-                {
-                    $expMainIndex = rand(0, count($typeExpsOneB) - 1);
+                if (! array_key_exists($typeExpsOneA[$expMainIndex], $explanations["main_exp"])){
+                    $explanations["main_exp"] += array($typeExpsOneA[$expMainIndex] => "");
                 }
-                $mainTypeExplB = $typeExpsOneB[$expMainIndex];
+                if (! array_key_exists($typeExpsOneB[$expMainIndex], $explanations["main_exp"])){
+                    $explanations["main_exp"] += array($typeExpsOneB[$expMainIndex] => "");
+                }
+
                 $mainTypeExplA = $typeExpsOneA[$expMainIndex];
+                $mainTypeExplB = $typeExpsOneB[$expMainIndex];
                 break;
             case 2: //double recipe explanations
-                while (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["main_exp"]))
-                {
-                    $expMainIndex = rand(0, count($typeExpsTwo) - 1);
+                if (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["main_exp"])){
+                    $explanations["main_exp"] += array($typeExpsTwo[$expMainIndex] => "");
                 }
                 $mainTypeExpl = $typeExpsTwo[$expMainIndex];
                 break;
@@ -220,27 +232,27 @@
 		$explanations["second_exp"] = getExplanation(createUrlExp(
                 $mood, $stress, $depression,
                 $fatclass, $health_style, $health_condition, $activity, $sleep,
-                $vegetarian, $lactose, $gluten, $nickel, $light,
+                $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
                 $user_time, $user_cost, $age, $goal,
                 $user_difficulty, $imgurlA, $imgurlB,
-                $userFavIngredients, $type_explanation)
+                $userFavIngredients, $expSecondIndex)
 		);
         switch ($showExpl){
             case 0: //no explanation
                 break;
             case 1:
-                while (! (array_key_exists($typeExpsOneA[$expSecondIndex],$explanations["second_exp"])) and
-                    (array_key_exists($typeExpsOneB[$expSecondIndex], $explanations["second_exp"])))
-                {
-                    $expSecondIndex = rand(0, count($typeExpsOneB) - 1);
+                if (! array_key_exists($typeExpsOneA[$expMainIndex], $explanations["second_exp"])){
+                    $explanations["second_exp"] += array($typeExpsOneA[$expMainIndex] => "");
+                }
+                if (! array_key_exists($typeExpsOneB[$expMainIndex], $explanations["second_exp"])){
+                    $explanations["second_exp"] += array($typeExpsOneB[$expMainIndex] => "");
                 }
                 $secondTypeExplB = $typeExpsOneB[$expSecondIndex];
                 $secondTypeExplA = $typeExpsOneA[$expSecondIndex];
                 break;
             case 2:
-                while (! array_key_exists($typeExpsTwo[$expSecondIndex], $explanations["second_exp"]))
-                {
-                    $expSecondIndex = rand(0, count($typeExpsTwo) - 1);
+                if (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["second_exp"])){
+                    $explanations["second_exp"] += array($typeExpsTwo[$expMainIndex] => "");
                 }
                 $secondTypeExpl = $typeExpsTwo[$expSecondIndex];
                 break;
@@ -252,27 +264,27 @@
 		$explanations["dessert_exp"] = getExplanation(createUrlExp(
                 $mood, $stress, $depression,
                 $fatclass, $health_style, $health_condition, $activity, $sleep,
-                $vegetarian, $lactose, $gluten, $nickel, $light,
+                $vegetarian, $lactose, $gluten, $nickel, $light, $diabetes, $pregnant,
                 $user_time, $user_cost, $age, $goal,
                 $user_difficulty, $imgurlA, $imgurlB,
-                $userFavIngredients, $type_explanation)
+                $userFavIngredients, $expDessertIndex)
 		);
         switch ($showExpl){
             case 0: //single expl for recipe A
                 break;
             case 1:
-                while (! (array_key_exists($typeExpsOneB[$expDessertIndex], $explanations["dessert_exp"])) and
-                    (array_key_exists($typeExpsOneA[$expDessertIndex],$explanations["dessert_exp"])))
-                {
-                    $expDessertIndex = rand(0, count($typeExpsOneB) - 1);
+                if (! array_key_exists($typeExpsOneA[$expMainIndex], $explanations["dessert_exp"])){
+                    $explanations["dessert_exp"] += array($typeExpsOneA[$expMainIndex] => "");
+                }
+                if (! array_key_exists($typeExpsOneB[$expMainIndex], $explanations["dessert_exp"])){
+                    $explanations["dessert_exp"] += array($typeExpsOneB[$expMainIndex] => "");
                 }
                 $dessertTypeExplB = $typeExpsOneB[$expDessertIndex];
                 $dessertTypeExplA = $typeExpsOneA[$expDessertIndex];
                 break;
             case 2:
-                while (! array_key_exists($typeExpsTwo[$expDessertIndex], $explanations["dessert_exp"]))
-                {
-                    $expDessertIndex = rand(0, count($typeExpsTwo) - 1);
+                if (! array_key_exists($typeExpsTwo[$expMainIndex], $explanations["dessert_exp"])){
+                    $explanations["dessert_exp"] += array($typeExpsTwo[$expMainIndex] => "");
                 }
                 $dessertTypeExpl = $typeExpsTwo[$expDessertIndex];
                 break;

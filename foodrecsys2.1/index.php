@@ -9,15 +9,15 @@
                     <div class="section-content blog-content">
                         <!-- Section Title -->
                         <div class="title-wrap">
-                            <h2 class="section-title">Hello,</h2>
+                            <!-- <h2 class="section-title">Hello,</h2> -->
                             <p class="section-sub-title">
                                 In this experiment you will receive three recommendations about FOOD you can enjoy.
                                 <br>These recommendations are based on your personal characteristics as well as on the popularity of the recipe.
-                                <br>In the following, we will ask you some information about you, your food preferences, and food habits.
-                                <br>Next, you will receive two different food recommendations and you will be asked to choose the one you prefer.
-                                <br>Next, you will receive the same recommendations accompanied by an explanation that provides you some extra information about the characteristics of both the recipes, and you can freely decide to change your selection on not.
-                                <br>For each recommendation, you have to fill in a short questionnaire investigating the reasons that motivate your choice.
+                                <br><br>In the following, we will ask you some information about you, your food preferences, and food habits.
+                                <br>Next, you will receive two different food recommendations for the main course, the second course and for the dessert.
+                                <br>For each couple of recommendations, you will be asked to choose the one you prefer and you will have to fill in a questionnaire about the reasons behind your choice.
                                 <br>The whole experiment will take less than five minutes.
+                                <br><br><span style="font-size: 175%">Thank you for your time</span>
                             </p>
 
                         </div>

@@ -150,6 +150,7 @@
     </div>
 </div>
 
+<!--
 <div class="form-group row" id="Q8div">
 	<div class="col-lg-6">
 		<label class="question" for="Q8">Other: </label>
@@ -158,6 +159,7 @@
 		<textarea class="form-control" id="Q8" name="Q8" rows="2"></textarea>
 	</div>
 </div>
+-->
 
 <!-- Main JS -->
 <script>

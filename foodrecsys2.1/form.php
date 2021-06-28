@@ -13,9 +13,10 @@ $_SESSION['mainTypeExplA'] = "";
 $_SESSION['secondTypeExplA'] = "";
 $_SESSION['dessertTypeExplA'] = "";
 
-$_SESSION['mainTypeExplB'] ="";
+$_SESSION['mainTypeExplB'] = "";
 $_SESSION['secondTypeExplB'] = "";
 $_SESSION['dessertTypeExplB'] = "";
+
 ?>
 <html lang="en">
     <?php include "php/head.php"; ?>
@@ -56,9 +57,6 @@ $_SESSION['dessertTypeExplB'] = "";
                                             </div>
                                         </div>
 
-
-
-
                                         <label for="age" class="col-sm-2 col-form-label offset-sm-1">Your age is:</label>
                                         <div class="col-sm-2" style="padding-right : 0px; margin-right : 0px;">
                                             <div class="form-check form-check-inline">
@@ -67,21 +65,21 @@ $_SESSION['dessertTypeExplB'] = "";
                                             </div>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="age" id="U40" value="U40" required>
-                                                <label class="form-check-label" for="U40">31-40</label>
+                                                <label class="form-check-label" for="U40">30-39</label>
                                             </div>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="age" id="U60" value="U60" required>
-                                                <label class="form-check-label" for="U60">51-60</label>
+                                                <label class="form-check-label" for="U60">50-59</label>
                                             </div>
                                         </div>
                                         <div class="col-sm-2" style="padding-left:0px; margin-left:0px;">
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="age" id="U30" value="U30" required>
-                                                <label class="form-check-label" for="U30">20-30</label>
+                                                <label class="form-check-label" for="U30">20-29</label>
                                             </div>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="age" id="U50" value="U50" required>
-                                                <label class="form-check-label" for="U50">41-50</label>
+                                                <label class="form-check-label" for="U50">40-49</label>
                                             </div>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="age" id="O60" value="O60" required>
@@ -279,8 +277,8 @@ $_SESSION['dessertTypeExplB'] = "";
                                         <div class="col-sm-5">
                                             <select class="form-control" id="goalSelector" name="goal" required>
                                                 <option hidden disabled selected value></option>
-                                                <option value="1">Lose weight</option>
-                                                <option value="-1">Gain weight</option>
+                                                <option value="-1">Lose weight</option>
+                                                <option value="1">Gain weight</option>
                                                 <option value="0">No goals</option>
                                             </select>
                                         </div>
@@ -358,6 +356,7 @@ $_SESSION['dessertTypeExplB'] = "";
                                     </div>
 
                                     <!-- Restriction -->
+                                    <!--
                                     <div class="form-group row">
                                         <label for="restriction" class="col-sm-6 col-form-label">Select your restriction</label>
                                         <div class="col-sm-5">
@@ -378,6 +377,41 @@ $_SESSION['dessertTypeExplB'] = "";
                                                 <label for="nickel">Low-Nickel</label>
                                             </div>
                                             <div class="form-check form-check-inline">
+                                                <input id="light" name="light" type="checkbox">
+                                                <label for="light">Light recipe</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    -->
+
+                                    <div class="form-group row">
+                                        <label for="restriction" class="col-sm-6 col-form-label">Select your restriction</label>
+                                        <div class="col-sm-5">
+                                            <div class="form-check">
+                                                <input id="diabetes" name="diabetes" type="checkbox">
+                                                <label for="diabetes">Diabetes</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="pregnant" name="pregnant" type="checkbox">
+                                                <label for="pregnant">Pregnant or breastfeeding</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="vegetarian" name="vegetarian" type="checkbox">
+                                                <label for="vegetarian">Vegetarian</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="lactose" name="lactose" type="checkbox">
+                                                <label for="lactose">Lactose-free</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="gluten" name="gluten" type="checkbox">
+                                                <label for="gluten">Gluten-free</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="nickel" name="nickel" type="checkbox">
+                                                <label for="nickel">Low-Nickel</label>
+                                            </div>
+                                            <div class="form-check">
                                                 <input id="light" name="light" type="checkbox">
                                                 <label for="light">Light recipe</label>
                                             </div>
